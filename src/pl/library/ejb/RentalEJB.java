@@ -12,6 +12,7 @@ import javax.persistence.Query;
 
 import pl.library.dao.Rental;
 import pl.library.dao.Volume;
+import pl.kurs.dto.RentalDTO;
 import pl.library.dao.Reader;
 
 @Stateful
@@ -20,20 +21,67 @@ public class RentalEJB {
 	@PersistenceContext(name="komis")
 	EntityManager manager;
 	
-	public Rental create(Rental rental) {
-		manager.persist(rental);
-		return rental;
-	}
+	public Rental create(RentalDTO rentalDTO)  throws Exception{
+		 Reader reader = manager.find(Reader.class, rentalDTO.getReaderId());
+	        if (reader == null) {
+	            throw new Exception("Reader not found with id: " + rentalDTO.getReaderId());
+	        }
+	        
+	        List<Volume> volumes = new ArrayList<Volume>();
+	        for (Integer volumeId : rentalDTO.getVolumeIds()) {
+	            Volume volume = manager.find(Volume.class, volumeId);
+	            if (volume == null) {
+	                throw new Exception("Volume not found with id: " + volumeId);
+	            }
+	            volumes.add(volume);
+	        }
+
+	        Rental rental = new Rental();
+	        rental.setRentalDate(rentalDTO.getRentalDate());
+	        rental.setReturnDate(rentalDTO.getReturnDate());
+	        rental.setDueDate(rentalDTO.getDueDate());
+	        rental.setReader(reader);
+	        rental.setVolumes(volumes);
+	        
+	        manager.persist(rental);
+	        return rental;
+	} 
 	
 	public Rental get(int id) {
 		return manager.find(Rental.class, id);
 	}
-	public List<Rental> getAll() {
-		Query q = manager.createQuery("select c from Rental c");
-		@SuppressWarnings("unchecked")
-		List<Rental> list = q.getResultList();
-		return list;
-	}
+	public List<Rental> getAll(boolean delayed, Date afterDate, Date beforeDate, int readerId) {
+		String queryString = "SELECT r FROM Rental r WHERE 1=1";
+		 
+		if (delayed) {
+		        queryString += " AND r.returnDate > r.dueDate";
+	    }
+	    if (afterDate != null) {
+	        queryString += " AND r.returnDate >= :afterDate";
+	    }
+	    if (beforeDate != null) {
+	        queryString += " AND r.returnDate <= :beforeDate";
+	    }
+	    if (readerId != 0) {
+	        queryString += " AND r.reader.id = :readerId";
+	    }
+	    
+	    Query query = manager.createQuery(queryString);
+	    
+	    if (afterDate != null) {
+	        query.setParameter("afterDate", afterDate);
+	    }
+	    if (beforeDate != null) {
+	        query.setParameter("beforeDate", beforeDate);
+	    }
+	    if (readerId != 0) {
+	        query.setParameter("readerId", readerId);
+	    }
+	    
+	    @SuppressWarnings("unchecked")
+	    List<Rental> resultList = query.getResultList();
+	    return resultList;
+}
 	
 	public Rental update(Rental rental) {
 		return manager.merge(rental);
