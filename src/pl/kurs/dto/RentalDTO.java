@@ -4,12 +4,16 @@ import java.sql.Date;
 import java.util.List;
 
 public class RentalDTO {
-	  private Date rentalDate;
+		private int id;
+		private Date rentalDate;
 	    private Date returnDate;
 	    private Date dueDate;
 	    private int readerId;
 	    private List<Integer> volumeIds;
 
+	    public int getId(){
+	    	return id;
+	    }
 	    public Date getRentalDate() {
 	        return rentalDate;
 	    }
