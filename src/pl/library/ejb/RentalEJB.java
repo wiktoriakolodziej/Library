@@ -15,11 +15,12 @@ import pl.library.dao.Volume;
 import pl.kurs.dto.RentalDTO;
 import pl.library.dao.Reader;
 
+
 @Stateful
 public class RentalEJB {
 	
 	@PersistenceContext(name="komis")
-	EntityManager manager;
+	EntityManager manager; 
 	
 	public Rental create(RentalDTO rentalDTO)  throws Exception{
 		 Reader reader = manager.find(Reader.class, rentalDTO.getReaderId());
@@ -83,7 +84,35 @@ public class RentalEJB {
 	    return resultList;
 }
 	
-	public Rental update(Rental rental) {
+	public Rental update(RentalDTO rentalDTO) throws Exception {
+		if(rentalDTO.getId() == 0){
+			throw new Exception("Rental id was not provided");
+		}
+		Rental rental = manager.find(Rental.class, rentalDTO.getId());
+		if(rental == null){
+			throw new Exception("Rental of given id doesn't exist:" + rentalDTO.getId());
+		}
+		if(rentalDTO.getDueDate() != null) rental.setDueDate(rentalDTO.getDueDate());
+		if(rentalDTO.getReaderId() != 0) {
+			Reader reader = manager.find(Reader.class, rentalDTO.getReaderId());
+			if(reader == null){
+				throw new Exception("Reader of given id doesn't exist:" + rentalDTO.getReaderId());
+			}
+			rental.setReader(manager.find(Reader.class, rentalDTO.getReaderId()));
+		}
+		if(rentalDTO.getRentalDate() != null) rental.setRentalDate(rentalDTO.getRentalDate());
+		if(rentalDTO.getReturnDate() != null) rental.setReturnDate(rentalDTO.getReturnDate());
+		if(rentalDTO.getVolumeIds() != null){
+	        List<Volume> volumes = rental.getVolumes();
+	        for (Integer volumeId : rentalDTO.getVolumeIds()) {
+	            Volume volume = manager.find(Volume.class, volumeId);
+	            if (volume == null) {
+	                throw new Exception("Volume not found with id: " + volumeId);
+	            }
+	            volumes.add(volume);
+	        }
+	        rental.setVolumes(volumes);
+		}
 		return manager.merge(rental);
 	}
 	public void delete(int id) {

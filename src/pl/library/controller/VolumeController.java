@@ -32,3 +32,4 @@ public class VolumeController {
 		return Response.ok(bean.getAll()).build();
 	}
 }
+

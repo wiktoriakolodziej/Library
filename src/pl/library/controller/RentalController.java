@@ -46,6 +46,7 @@ public class RentalController {
 		 }
 	}
 	
+	
 	@GET
 	@Path("/{id}")
 	public Response getRentalById(@PathParam("id") int id) { 
@@ -71,7 +72,7 @@ public class RentalController {
 	}
 	
 	@PUT
-	public Response update(Rental rental) {
+	public Response update(RentalDTO rental) {
 		try 
 		{
 			Rental result = bean.update(rental);
