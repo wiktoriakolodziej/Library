@@ -46,6 +46,7 @@ public class RentalController {
 		 }
 	}
 	
+	
 	@GET
 	@Path("/{id}")
 	public Response getRentalById(@PathParam("id") int id) { 

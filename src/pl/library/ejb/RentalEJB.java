@@ -15,11 +15,12 @@ import pl.library.dao.Volume;
 import pl.kurs.dto.RentalDTO;
 import pl.library.dao.Reader;
 
+
 @Stateful
 public class RentalEJB {
 	
 	@PersistenceContext(name="komis")
-	EntityManager manager;
+	EntityManager manager; 
 	
 	public Rental create(RentalDTO rentalDTO)  throws Exception{
 		 Reader reader = manager.find(Reader.class, rentalDTO.getReaderId());

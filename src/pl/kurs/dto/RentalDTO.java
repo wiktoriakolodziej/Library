@@ -27,6 +27,7 @@ public class RentalDTO {
 	    }
 
 	    public void setReturnDate(Date returnDate) {
+	    	
 	        this.returnDate = returnDate;
 	    }
 

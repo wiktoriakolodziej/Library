@@ -24,6 +24,7 @@ import pl.library.ejb.ReaderEJB;
 @Produces({ "application/json" })
 public class ReaderController {
 
+	
     @EJB
     ReaderEJB bean;
 
