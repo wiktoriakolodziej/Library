@@ -1,4 +1,4 @@
-package pl.kurs.dto;
+package pl.library.dto;
 
 import java.sql.Date;
 import java.util.List;

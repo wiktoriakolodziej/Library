@@ -1,6 +1,5 @@
 package pl.library.controller;
 
-
 import java.sql.Date;
 import java.util.List;
 
@@ -19,26 +18,30 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import pl.library.dao.Book;
 import pl.library.dao.Rental;
+import pl.library.dto.BookDTO;
+import pl.library.dto.BookUpdateDTO;
 import pl.library.dto.RentalDTO;
-import pl.library.ejb.RentalEJB;
+import pl.library.ejb.BookEJB;
 
-
-@Path("/rental")
+@Path("/book")
 @Consumes({ "application/json" })
 @Produces({ "application/json" })
-public class RentalController {
+public class BookController {
+	
+	
 	@EJB
-	RentalEJB bean;
+	BookEJB bean;
 	
 	@PersistenceContext(name="komis")
 	EntityManager manager;
 	
 	@POST
-	public Response create(RentalDTO rental) {
+	public Response create(Book book) {
 		 try {
-            Rental createdRental = bean.create(rental);
-            return Response.status(Response.Status.CREATED).entity(createdRental).build();
+            Book createdBook = bean.create(book);
+            return Response.status(Response.Status.CREATED).entity(createdBook).build();
 	     } 
 		 catch (Exception e) {
             e.printStackTrace();
@@ -48,22 +51,19 @@ public class RentalController {
 	
 	@GET
 	@Path("/{id}")
-	public Response getRentalById(@PathParam("id") int id) { 
-		Rental result = bean.get(id);
+	public Response getBookById(@PathParam("id") int id) { 
+		Book result = bean.get(id);
 		if(result == null) 
 			return Response.status(Response.Status.NOT_FOUND).build();
 		return Response.ok(bean.get(id)).build();
 	}
 	
 	@GET
-	public Response getAll( @QueryParam("delayed") @DefaultValue("false") boolean delayed,
-	        @QueryParam("afterRentalDate") Date afterDate,
-	        @QueryParam("beforeRentalDate") Date beforeDate,
-	        @QueryParam("readerId") @DefaultValue("0") int readerId) 
+	public Response getAll() 
 	{
 		 try {
-	            List<Rental> rentals = bean.getAll(delayed, afterDate, beforeDate, readerId);
-	            return Response.ok(rentals).build();
+	            List<Book> books = bean.getAll();
+	            return Response.ok(books).build();
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
@@ -71,10 +71,10 @@ public class RentalController {
 	}
 	
 	@PUT
-	public Response update(Rental rental) {
+	public Response update(BookUpdateDTO book) {
 		try 
 		{
-			Rental result = bean.update(rental);
+			Book result = bean.update(book);
 			return Response.ok(result).build();
 		} 
 		catch (Exception e) 
@@ -84,6 +84,7 @@ public class RentalController {
 		}
 	}
 	
+	//TO DO on delete cascade
 	@DELETE
 	@Path("/{id}")
 	public Response delete(@PathParam("id") int id) {
@@ -91,9 +92,12 @@ public class RentalController {
 		return Response.ok().build();
 	}
 	
-	@GET
+	/*@GET
 	@Path("/test")
 	public Rental test(){
 		return bean.test();
-	}
+	}*/
+	
+	
+
 }

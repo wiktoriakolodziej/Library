@@ -12,7 +12,7 @@ import javax.persistence.Query;
 
 import pl.library.dao.Rental;
 import pl.library.dao.Volume;
-import pl.kurs.dto.RentalDTO;
+import pl.library.dto.RentalDTO;
 import pl.library.dao.Reader;
 
 @Stateful

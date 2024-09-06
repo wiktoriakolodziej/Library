@@ -40,7 +40,7 @@ public class Volume {
 	//@ManyToMany(mappedBy = "volumes")
 	//ArrayList<Rental> rentals;
 	
-	private ArrayList<Reader> readers;
+	//private ArrayList<Reader> readers;
 	
 	public int getId(){return id;}
 	public void setId(int id){this.id = id;}
@@ -63,7 +63,7 @@ public class Volume {
 	//public ArrayList<Rental> getRentals(){return rentals;}
 	//public void setRentals(Set<Rental> rentals){this.rentals = rentals;} 
 	
-	public ArrayList<Reader> getReaders(){return readers;}
-	public void setReaders(ArrayList<Reader> readers){this.readers = readers;} 
+	//public ArrayList<Reader> getReaders(){return readers;}
+	//public void setReaders(ArrayList<Reader> readers){this.readers = readers;} 
 
 }
