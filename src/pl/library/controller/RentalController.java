@@ -19,8 +19,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import pl.kurs.dto.RentalDTO;
 import pl.library.dao.Rental;
+import pl.library.dto.RentalDTO;
 import pl.library.ejb.RentalEJB;
 
 
