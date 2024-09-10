@@ -20,7 +20,8 @@ import javax.ws.rs.core.Response;
 
 import pl.library.dao.Book;
 import pl.library.dao.Rental;
-import pl.library.dto.BookDTO;
+import pl.library.dto.BookCreateDTO;
+import pl.library.dto.BookReturnDTO;
 import pl.library.dto.BookUpdateDTO;
 import pl.library.dto.RentalDTO;
 import pl.library.ejb.BookEJB;
@@ -38,7 +39,7 @@ public class BookController {
 	EntityManager manager;
 	
 	@POST
-	public Response create(Book book) {
+	public Response create(BookCreateDTO book) {
 		 try {
             Book createdBook = bean.create(book);
             return Response.status(Response.Status.CREATED).entity(createdBook).build();
@@ -52,7 +53,8 @@ public class BookController {
 	@GET
 	@Path("/{id}")
 	public Response getBookById(@PathParam("id") int id) { 
-		Book result = bean.get(id);
+		BookReturnDTO result = bean.get(id);
+		//Book result = bean.get(id);
 		if(result == null) 
 			return Response.status(Response.Status.NOT_FOUND).build();
 		return Response.ok(bean.get(id)).build();
@@ -62,7 +64,7 @@ public class BookController {
 	public Response getAll() 
 	{
 		 try {
-	            List<Book> books = bean.getAll();
+	            List<BookReturnDTO> books = bean.getAll();
 	            return Response.ok(books).build();
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -74,7 +76,9 @@ public class BookController {
 	public Response update(BookUpdateDTO book) {
 		try 
 		{
-			Book result = bean.update(book);
+
+			BookUpdateDTO result = bean.update(book);
+			
 			return Response.ok(result).build();
 		} 
 		catch (Exception e) 
@@ -84,20 +88,10 @@ public class BookController {
 		}
 	}
 	
-	//TO DO on delete cascade
 	@DELETE
 	@Path("/{id}")
 	public Response delete(@PathParam("id") int id) {
 		bean.delete(id);
 		return Response.ok().build();
 	}
-	
-	/*@GET
-	@Path("/test")
-	public Rental test(){
-		return bean.test();
-	}*/
-	
-	
-
 }

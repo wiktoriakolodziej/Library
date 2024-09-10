@@ -2,7 +2,7 @@ package pl.library.dto;
 
 import javax.persistence.Column;
 
-public class BookDTO {
+public class BookCreateDTO {
 	
 	String title;
 	String authorName;

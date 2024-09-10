@@ -6,11 +6,13 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.OneToMany;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashSet;
 
 import javax.ejb.Stateful;
 
@@ -18,8 +20,10 @@ import pl.library.dao.Book;
 import pl.library.dao.Reader;
 import pl.library.dao.Rental;
 import pl.library.dao.Volume;
-import pl.library.dto.BookDTO;
+import pl.library.dto.BookCreateDTO;
+import pl.library.dto.BookReturnDTO;
 import pl.library.dto.BookUpdateDTO;
+import pl.library.dto.BookVolumeReturnDTO;
 import pl.library.dto.RentalDTO;
 
 @Stateful
@@ -28,7 +32,7 @@ public class BookEJB {
 	EntityManager manager;
 	
 	
-	public Book create(Book bookDTO){
+	public Book create(BookCreateDTO bookDTO){
 	        
 	        Book book = new Book();
 	        book.setAuthorName(bookDTO.getAuthorName());
@@ -42,49 +46,67 @@ public class BookEJB {
 	        return book;
 	} 
 	
-	/*public Book create(Book book){
-		manager.persist(book);
-		return book;
-	}*/
 
-	public List<Book> getAll(){
-		//Query q = manager.createQuery("SELECT b from Book b");
+	public List<BookReturnDTO> getAll(){
 		
 		String queryString = "SELECT v FROM Book v";		
-		Query query = manager.createQuery(queryString);
-	    
-	    /*if (bookId != 0) {
-	        query.setParameter("bookId", bookId);
-	    }*/
+		Query query = manager.createQuery(queryString);		
 		
-		
-		@SuppressWarnings("unchecked")
-		
-		List<Book> list = query.getResultList();
-		for(Book b : list){
-			Set<Volume> vList = b.getVolumes();
-			for(Volume v : vList){
-				v.setBook(null);
+		@SuppressWarnings("unchecked")		
+		List<Book> bookList = query.getResultList();
+		List<BookReturnDTO> bookListDTO = new ArrayList<BookReturnDTO>();
+		for(Book b : bookList)  {
+			BookReturnDTO bookReturnDTO = new BookReturnDTO();
+			bookReturnDTO.setId(b.getId());
+			bookReturnDTO.setAuthorName(b.getAuthorName());
+			bookReturnDTO.setAuthorSurname(b.getAuthorSurname());
+			bookReturnDTO.setTitle(b.getTitle());
+			bookReturnDTO.setDescription(b.getDescription());
+			bookReturnDTO.setVersion(b.getVersion());
+			
+			Set<Volume> vols = b.getVolumes();
+			Set<BookVolumeReturnDTO> volsDTO = new HashSet<BookVolumeReturnDTO>();
+			for(Volume v : vols){
+				BookVolumeReturnDTO bvrDTO = new BookVolumeReturnDTO();
+				bvrDTO.setId(v.getId());
+				bvrDTO.setCondition(v.getCondition());
+				bvrDTO.setPages(v.getPages());
+				bvrDTO.setYearOfPublication(v.getYearOfPublication());
+				bvrDTO.setBookCover(v.getBookCover());
+				volsDTO.add(bvrDTO);
 			}
-			//VolumeReturnDTO volumeReturn = new VolumeReturnDTO();			
+			bookReturnDTO.setVolumes(volsDTO);
+			bookListDTO.add(bookReturnDTO);
 		}
-		
-		
-		//List<Book> list = query.getResultList();
-		return list;
+
+		return bookListDTO;
 	}
 	
 
 	
-	public Book get(int id) {
-		return manager.find(Book.class, id);
+	public BookReturnDTO get(int id) {
+		Book b = manager.find(Book.class, id);
+		BookReturnDTO bookReturnDTO = new BookReturnDTO();
+		bookReturnDTO.setId(b.getId());
+		bookReturnDTO.setAuthorName(b.getAuthorName());
+		bookReturnDTO.setAuthorSurname(b.getAuthorSurname());
+		bookReturnDTO.setTitle(b.getTitle());
+		bookReturnDTO.setDescription(b.getDescription());
+		bookReturnDTO.setVersion(b.getVersion());
+		return bookReturnDTO;
+		//return manager.find(Book.class, id);
 	}
 	
-	public Book update(BookUpdateDTO book) {
+	public BookUpdateDTO update(BookUpdateDTO book) {
 		Book existingBook = manager.find(Book.class, book.getId());
+		
 		if (existingBook == null) {
             throw new EntityNotFoundException("Book not found with id: " + book.getId());
         }
+		Set<Volume> v = existingBook.getVolumes();
+		
+		existingBook.setId(existingBook.getId());
+		
         if (book.getAuthorName() != null) {
         	existingBook.setAuthorName(book.getAuthorName());
         }
@@ -100,8 +122,18 @@ public class BookEJB {
         if (book.getVersion() != 0) {
         	existingBook.setVersion(book.getVersion());
         }
-        return existingBook;
-		//return manager.merge(book);
+        
+        existingBook.setVolumes(v);
+        manager.persist(existingBook);
+        
+        BookUpdateDTO ret = new BookUpdateDTO();
+		ret.setAuthorName(existingBook.getAuthorName());
+		ret.setAuthorSurname(existingBook.getAuthorSurname());
+		ret.setDescription(existingBook.getDescription());
+		ret.setId(existingBook.getId());
+		ret.setTitle(existingBook.getTitle());
+		ret.setVersion(existingBook.getVersion());
+        return ret;
 	}
 	
 	public void delete(int id) {

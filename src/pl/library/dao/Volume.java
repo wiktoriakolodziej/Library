@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,16 +32,11 @@ public class Volume {
 	@Column(updatable = false, nullable = false)
 	int pagess;
 	@Enumerated(EnumType.STRING)
-	Conditionn conditionn;
+	Conditionn conditionn;	
 	
 	@ManyToOne
 	@JoinColumn(name = "book_id")
 	Book book;
-	
-	//@ManyToMany(mappedBy = "volumes")
-	//ArrayList<Rental> rentals;
-	
-	//private ArrayList<Reader> readers;
 	
 	public int getId(){return id;}
 	public void setId(int id){this.id = id;}
@@ -59,11 +55,5 @@ public class Volume {
 	
 	public Conditionn getCondition(){return conditionn;}
 	public void setCondition(Conditionn conditionn){this.conditionn = conditionn;}
-	
-	//public ArrayList<Rental> getRentals(){return rentals;}
-	//public void setRentals(Set<Rental> rentals){this.rentals = rentals;} 
-	
-	//public ArrayList<Reader> getReaders(){return readers;}
-	//public void setReaders(ArrayList<Reader> readers){this.readers = readers;} 
 
 }

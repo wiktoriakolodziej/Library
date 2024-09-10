@@ -1,5 +1,9 @@
 package pl.library.dto;
 
+import java.util.Set;
+
+import pl.library.dao.Volume;
+
 public class BookReturnDTO {
 	int id;
 	String title;
@@ -7,8 +11,11 @@ public class BookReturnDTO {
 	String authorSurname;
 	int version;
 	String description;
+	Set<BookVolumeReturnDTO> volumes;
 	
-	 public BookReturnDTO(int id, String title, String authorName, String authorSurname, int version, 
+	public BookReturnDTO(){}
+	
+	public BookReturnDTO(int id, String title, String authorName, String authorSurname, int version, 
 			String description) {
 	        this.id = id;
 	        this.title = title;
@@ -16,7 +23,7 @@ public class BookReturnDTO {
 	        this.authorSurname = authorSurname;
 	        this.version = version;
 	        this.description = description;
-	    }
+	}
 	
 	public int getId(){return id;}
 	public void setId(int id){this.id = id;}
@@ -35,4 +42,7 @@ public class BookReturnDTO {
 	
 	public String getDescription(){return description;}
 	public void setDescription(String description){this.description = description;}
+	
+	public Set<BookVolumeReturnDTO> getVolumes() {return volumes;}
+	public void setVolumes(Set<BookVolumeReturnDTO> volumes) {this.volumes =  volumes;}
 }
