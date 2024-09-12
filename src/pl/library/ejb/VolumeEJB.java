@@ -12,7 +12,7 @@ import pl.library.dao.Volume;
 import pl.library.dto.VolumeBookReturnDTO;
 import pl.library.dto.VolumeDTO;
 import pl.library.dto.VolumeReturnDTO;
-import pl.library.dto.VolumeUpdateDTO;
+import pl.library.dto.VolumeUpdateDTO; 
 
 @Stateful
 public class VolumeEJB {
