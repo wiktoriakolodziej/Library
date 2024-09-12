@@ -1,14 +1,18 @@
 package pl.library.dao;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+
+//import org.hibernate.annotations.CascadeType;
 
 
 @Entity
@@ -27,8 +31,10 @@ public class Book {
 	String authorSurname;
 	int version;
 	String description;
-
-	@OneToMany(mappedBy = "book")
+		
+	
+	//@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	Set<Volume> volumes;
 	
 	public int getId(){return id;}

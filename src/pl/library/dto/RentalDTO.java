@@ -4,8 +4,9 @@ import java.sql.Date;
 import java.util.List;
 
 public class RentalDTO {
-		private int id;
-		private Date rentalDate;
+
+      private int id;
+      private Date rentalDate;
 	    private Date returnDate;
 	    private Date dueDate;
 	    private int readerId;
@@ -14,6 +15,7 @@ public class RentalDTO {
 	    public int getId(){
 	    	return id;
 	    }
+
 	    public Date getRentalDate() {
 	        return rentalDate;
 	    }
@@ -27,7 +29,6 @@ public class RentalDTO {
 	    }
 
 	    public void setReturnDate(Date returnDate) {
-	    	
 	        this.returnDate = returnDate;
 	    }
 
