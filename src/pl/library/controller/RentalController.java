@@ -92,4 +92,11 @@ public class RentalController {
 		return Response.ok().build();
 	}
 	
+	
+	@GET
+	@Path("/testReader")
+	public void testReader(){
+		bean.testReader();
+	}
+	
 }
