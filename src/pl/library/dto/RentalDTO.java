@@ -1,6 +1,7 @@
 package pl.library.dto;
 
-import java.sql.Date;
+
+import java.util.Date;
 import java.util.List;
 
 public class RentalDTO {
@@ -14,6 +15,10 @@ public class RentalDTO {
 
 	    public int getId(){
 	    	return id;
+	    }
+	    
+	    public void setId(int id){
+	    	this.id = id;
 	    }
 
 	    public Date getRentalDate() {

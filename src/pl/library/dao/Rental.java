@@ -45,6 +45,7 @@ public class Rental implements Serializable{
 			name = "rental_volumes",
 			joinColumns = @JoinColumn(name = "rental_id"),
 			inverseJoinColumns = @JoinColumn(name = "volume_id"))
+	@Column(nullable = false)
 	public List<Volume> volumes;
 	
 

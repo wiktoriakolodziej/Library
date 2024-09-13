@@ -37,7 +37,7 @@ public class RentalController {
 	@POST
 	public Response create(RentalDTO rental) {
 		 try {
-            Rental createdRental = bean.create(rental);
+            RentalDTO createdRental = bean.create(rental);
             return Response.status(Response.Status.CREATED).entity(createdRental).build();
 	     } 
 		 catch (Exception e) {
@@ -50,7 +50,7 @@ public class RentalController {
 	@GET
 	@Path("/{id}")
 	public Response getRentalById(@PathParam("id") int id) { 
-		Rental result = bean.get(id);
+		RentalDTO result = bean.get(id);
 		if(result == null) 
 			return Response.status(Response.Status.NOT_FOUND).build();
 		return Response.ok(bean.get(id)).build();
@@ -63,7 +63,7 @@ public class RentalController {
 	        @QueryParam("readerId") @DefaultValue("0") int readerId) 
 	{
 		 try {
-	            List<Rental> rentals = bean.getAll(delayed, afterDate, beforeDate, readerId);
+	            List<RentalDTO> rentals = bean.getAll(delayed, afterDate, beforeDate, readerId);
 	            return Response.ok(rentals).build();
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -75,7 +75,7 @@ public class RentalController {
 	public Response update(RentalDTO rental) {
 		try 
 		{
-			Rental result = bean.update(rental);
+			RentalDTO result = bean.update(rental);
 			return Response.ok(result).build();
 		} 
 		catch (Exception e) 
@@ -92,11 +92,6 @@ public class RentalController {
 		return Response.ok().build();
 	}
 	
-	@GET
-	@Path("/test")
-	public Rental test(){
-		return bean.test();
-	}
 	
 	@GET
 	@Path("/testReader")
