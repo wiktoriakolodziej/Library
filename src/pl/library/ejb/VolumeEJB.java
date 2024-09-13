@@ -1,6 +1,7 @@
 package pl.library.ejb;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
@@ -8,6 +9,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import pl.library.dao.Book;
+import pl.library.dao.Rental;
 import pl.library.dao.Volume;
 import pl.library.dto.VolumeBookReturnDTO;
 import pl.library.dto.VolumeDTO;
@@ -31,9 +33,6 @@ public class VolumeEJB {
 		vr.setYearOfPublication(v.getYearOfPublication());
 		
 		return vr;
-		//Volume v = manager.find(Volume.class, id);
-		//v.getBook().setVolumes(null);
-		//return  v;
 	}
 	
 	public List<VolumeReturnDTO> getAllAll(){
@@ -144,29 +143,18 @@ public class VolumeEJB {
 	}
 	
 	public void delete(int id) throws Exception {
-		//EntityTransaction transaction = manager.getTransaction();
 		try {
-		    //transaction.begin();
 		    Volume volume = manager.find(Volume.class, id);
-		
-		    //if (volume == null) {
-            //throw new Exception("Volume [" + id + "] not found.");
-        	//}
+		    Book book = volume.getBook();
+		    if (book != null) {
+		        book.getVolumes().remove(volume);
+		    }
 		    System.out.println("Volumin:" + id + ", of " + volume.getBook().getId());
 		    manager.remove(volume);
-		    
-
-		    //transaction.commit();
-		//manager.flush();
-		//manager.clear();
 		}
 		catch (Exception e) {
-		    /*if (transaction.isActive()) {
-		        transaction.rollback();
-		    }*/
 		    e.printStackTrace();
 		} finally {
-		    //manager.close(); // Zamkniêcie EntityManager
 		}
 	}
 	
@@ -186,4 +174,37 @@ public class VolumeEJB {
 	        manager.persist(volume);
 	        return volume;
 	} 	
+	
+	public boolean IsAvailable(int id, Date rentalDate, Date dueDate) throws Exception{
+	    Volume volume = manager.find(Volume.class, id);
+        if (volume == null) {
+            throw new Exception("Volume not found with id: " + id);
+        }
+        if (rentalDate == null) {
+            throw new Exception("Rental date is required");
+        }
+        if (dueDate == null) {
+            throw new Exception("Due date is required");
+        }
+        String queryString = "SELECT r FROM Rental r WHERE r.id = :id AND "
+				+ "(r.returnDate = NULL AND r.dueDate > :rentalDate AND r.rentalDate  < :rentalDate) OR "
+				+ "(r.returnDate = NULL AND r.rentalDate > :dueDate AND r.dueDate > :dueDate) OR "
+				+ "(r.returnDate = NULL AND r.rentalDate < :rentalDate AND r.dueDate > :dueDate) OR "
+				+ "(r.returnDate = NULL AND r.rentalDate > :rentalDate AND r.dueDate < :dueDate)";
+		Query query = manager.createQuery(queryString);
+	    
+		query.setParameter("rentalDate", rentalDate);
+		query.setParameter("dueDate", dueDate);
+
+	    
+	    @SuppressWarnings("unchecked")
+	    List<Rental> resultList = query.getResultList();
+	    if(resultList.isEmpty()){
+	    	//dostepny
+	    	return true;
+	    }
+	    else{
+	    	return false;
+	    }
+	}
 }

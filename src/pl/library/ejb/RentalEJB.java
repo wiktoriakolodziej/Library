@@ -131,7 +131,7 @@ public class RentalEJB {
 		reader.setBirthDate(Date.from(Instant.now()));
 		manager.persist(reader);
 		x.setReader(reader);
-		Volume y = new Volume();
+		/*Volume y = new Volume();
 		y.setYearOfPublication(1);
 		y.setPages(1);
 		manager.persist(y);
@@ -143,8 +143,15 @@ public class RentalEJB {
 		list.add(y);
 		list.add(z);
 		x.setVolumes(list);
-		manager.persist(x);
+		manager.persist(x);*/
 		return x;
 	}
-
+	
+	public void testReader(){
+		Reader reader = new Reader();
+		reader.setReaderName("domi");
+		reader.setReaderSurname("domi");
+		reader.setBirthDate(Date.from(Instant.now()));
+		manager.persist(reader);
+	}
 }

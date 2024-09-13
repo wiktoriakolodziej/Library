@@ -97,4 +97,11 @@ public class RentalController {
 	public Rental test(){
 		return bean.test();
 	}
+	
+	@GET
+	@Path("/testReader")
+	public void testReader(){
+		bean.testReader();
+	}
+	
 }
