@@ -55,7 +55,7 @@ public class RentalEJB {
 		String queryString = "SELECT r FROM Rental r WHERE 1=1";
 		 
 		if (delayed) {
-		        queryString += " AND r.returnDate > r.dueDate";
+		    queryString += " AND (r.returnDate > r.dueDate OR (r.returnDate IS NULL AND :todayDate >= r.dueDate))";
 	    }
 	    if (afterDate != null) {
 	        queryString += " AND r.returnDate >= :afterDate";
@@ -77,6 +77,9 @@ public class RentalEJB {
 	    }
 	    if (readerId != 0) {
 	        query.setParameter("readerId", readerId);
+	    }
+	    if (delayed){
+	    	query.setParameter("todayDate", Date.from(Instant.now()));
 	    }
 	    
 	    @SuppressWarnings("unchecked")
@@ -109,7 +112,8 @@ public class RentalEJB {
 	            if (volume == null) {
 	                throw new Exception("Volume not found with id: " + volumeId);
 	            }
-	            volumes.add(volume);
+	            if(!volumes.contains(volume))
+	            	volumes.add(volume);
 	        }
 	        rental.setVolumes(volumes);
 		}
