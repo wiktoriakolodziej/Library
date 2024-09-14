@@ -1,6 +1,6 @@
 package pl.library.dto;
 
-public class BookUpdateDTO {
+public class BookUpdateDTO { //chyba takie samo z VolumeBookReturnDTO
 	int id;
 	String title;
 	String authorName;

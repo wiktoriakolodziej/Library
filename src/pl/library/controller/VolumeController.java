@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import pl.library.dao.Rental;
 import pl.library.dao.Volume;
 import pl.library.dto.VolumeDTO;
+import pl.library.dto.VolumeIsAvailable;
 import pl.library.dto.VolumeReturnDTO;
 import pl.library.dto.VolumeUpdateDTO;
 import pl.library.ejb.VolumeEJB;
@@ -118,6 +119,24 @@ public class VolumeController {
 			e.printStackTrace();
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
-	}	
+	}
+	
+	@GET
+	@Path("/isAvailable")
+	public Response IsAvailable(VolumeIsAvailable volume){
+		try {
+		    System.out.println("Jestem przed wywolaniem ejb w kontrolerze");
+			bean.IsAvailable(volume);
+		    System.out.println("Jestem po wywolaniu ejb w kontrolerze");
+
+			return Response.ok().build();
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+	}
+
 }
 

@@ -13,6 +13,7 @@ import pl.library.dao.Rental;
 import pl.library.dao.Volume;
 import pl.library.dto.VolumeBookReturnDTO;
 import pl.library.dto.VolumeDTO;
+import pl.library.dto.VolumeIsAvailable;
 import pl.library.dto.VolumeReturnDTO;
 import pl.library.dto.VolumeUpdateDTO; 
 
@@ -160,6 +161,7 @@ public class VolumeEJB {
 	
 	
 	public Volume create(VolumeDTO volumeDTO)  throws Exception{
+
 		 Book book = manager.find(Book.class, volumeDTO.getBookId());	    
 	        if (book == null) {
 	            throw new Exception("Book not found with id: " + volumeDTO.getBookId());
@@ -175,10 +177,16 @@ public class VolumeEJB {
 	        return volume;
 	} 	
 	
-	public boolean IsAvailable(int id, Date rentalDate, Date dueDate) throws Exception{
-	    Volume volume = manager.find(Volume.class, id);
+	public boolean IsAvailable(VolumeIsAvailable volumeIsAvailable) throws Exception{
+	    System.out.println("Jestem na poczatku w ejb");
+	    int id = volumeIsAvailable.getId();
+	    Date rentalDate = volumeIsAvailable.getRentalDate();
+	    Date dueDate = volumeIsAvailable.getDueDate();
+	    
+
+	    Volume volume = manager.find(Volume.class, volumeIsAvailable.getId());
         if (volume == null) {
-            throw new Exception("Volume not found with id: " + id);
+            throw new Exception("Volume not found with id: " + volumeIsAvailable.getId());
         }
         if (rentalDate == null) {
             throw new Exception("Rental date is required");
@@ -187,18 +195,20 @@ public class VolumeEJB {
             throw new Exception("Due date is required");
         }
         String queryString = "SELECT r FROM Rental r WHERE r.id = :id AND "
-				+ "(r.returnDate = NULL AND r.dueDate > :rentalDate AND r.rentalDate  < :rentalDate) OR "
-				+ "(r.returnDate = NULL AND r.rentalDate > :dueDate AND r.dueDate > :dueDate) OR "
-				+ "(r.returnDate = NULL AND r.rentalDate < :rentalDate AND r.dueDate > :dueDate) OR "
-				+ "(r.returnDate = NULL AND r.rentalDate > :rentalDate AND r.dueDate < :dueDate)";
+				+ "((r.returnDate IS NULL AND r.dueDate > :rentalDate AND r.rentalDate  < :rentalDate AND r.dueDate < :dueDate) OR "
+				+ "(r.returnDate IS NULL AND r.rentalDate > :rentalDate AND r.dueDate > :dueDate AND r.rentalDate < :dueDate) OR " 
+				+ "(r.returnDate IS NULL AND r.rentalDate < :rentalDate AND r.dueDate > :dueDate) OR "
+				+ "(r.returnDate IS NULL AND r.rentalDate > :rentalDate AND r.dueDate < :dueDate))";
 		Query query = manager.createQuery(queryString);
 	    
+		query.setParameter("id", id);
 		query.setParameter("rentalDate", rentalDate);
 		query.setParameter("dueDate", dueDate);
 
 	    
 	    @SuppressWarnings("unchecked")
 	    List<Rental> resultList = query.getResultList();
+	    System.out.println("resultList.isEmpty(): " + resultList.isEmpty());
 	    if(resultList.isEmpty()){
 	    	//dostepny
 	    	return true;

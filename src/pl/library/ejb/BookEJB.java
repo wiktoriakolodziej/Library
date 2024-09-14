@@ -39,9 +39,7 @@ public class BookEJB {
 	        book.setAuthorSurname(bookDTO.getAuthorSurname());
 	        book.setTitle(bookDTO.getTitle());
 	        book.setVersion(bookDTO.getVersion());
-	        book.setDescription(bookDTO.getDescription());
-	        // setVolumes?
-	        
+	        book.setDescription(bookDTO.getDescription());	        
 	        manager.persist(book);
 	        return book;
 	} 
@@ -94,10 +92,9 @@ public class BookEJB {
 		bookReturnDTO.setDescription(b.getDescription());
 		bookReturnDTO.setVersion(b.getVersion());
 		return bookReturnDTO;
-		//return manager.find(Book.class, id);
 	}
 	
-	public BookUpdateDTO update(BookUpdateDTO book) {
+	public BookUpdateDTO update(BookUpdateDTO book)  {
 		Book existingBook = manager.find(Book.class, book.getId());
 		
 		if (existingBook == null) {
@@ -138,6 +135,9 @@ public class BookEJB {
 	
 	public void delete(int id) {
 		Book book = manager.find(Book.class, id);
+		if (book == null) {
+            throw new EntityNotFoundException("Book not found with id: " + id);
+        }
 		manager.remove(book);
 	}
 

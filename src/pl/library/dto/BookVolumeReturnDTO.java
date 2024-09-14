@@ -4,7 +4,7 @@ import pl.library.dao.Book;
 import pl.library.dao.Volume.BookCover;
 import pl.library.dao.Volume.Conditionn;
 
-public class BookVolumeReturnDTO {
+public class BookVolumeReturnDTO { //chyba to samo co VolumeUpdateDTO
 	int id;
 	int yearOfPublication;
 	BookCover bookCover;

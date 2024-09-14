@@ -54,7 +54,6 @@ public class BookController {
 	@Path("/{id}")
 	public Response getBookById(@PathParam("id") int id) { 
 		BookReturnDTO result = bean.get(id);
-		//Book result = bean.get(id);
 		if(result == null) 
 			return Response.status(Response.Status.NOT_FOUND).build();
 		return Response.ok(bean.get(id)).build();
@@ -63,7 +62,7 @@ public class BookController {
 	@GET
 	public Response getAll() 
 	{
-		 try {
+		try {
 	            List<BookReturnDTO> books = bean.getAll();
 	            return Response.ok(books).build();
 	        } catch (Exception e) {
