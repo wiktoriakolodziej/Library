@@ -144,30 +144,14 @@ public class VolumeEJB {
 	}
 	
 	public void delete(int id) throws Exception {
-		//EntityTransaction transaction = manager.getTransaction();
-		try {
-		    //transaction.begin();
 		    Volume volume = manager.find(Volume.class, id);
+		    if(volume == null) throw new Exception ("Volume of id " + id + " doesn't exist");
 		
-		    //if (volume == null) {
-            //throw new Exception("Volume [" + id + "] not found.");
-        	//}
 		    System.out.println("Volumin:" + id + ", of " + volume.getBook().getId());
 		    manager.remove(volume);
 		    
 
-		    //transaction.commit();
-		//manager.flush();
-		//manager.clear();
-		}
-		catch (Exception e) {
-		    /*if (transaction.isActive()) {
-		        transaction.rollback();
-		    }*/
-		    e.printStackTrace();
-		} finally {
-		    //manager.close(); // Zamkniêcie EntityManager
-		}
+	
 	}
 	
 	

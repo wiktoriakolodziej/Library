@@ -13,6 +13,7 @@ import javax.persistence.Query;
 import pl.library.dao.Rental;
 import pl.library.dao.Volume;
 import pl.library.dto.RentalDTO;
+import pl.library.dto.RentalUpdateDTO;
 import pl.library.dao.Reader;
 
 
@@ -73,7 +74,7 @@ public class RentalEJB {
 	    return result;
 }
 	
-	public RentalDTO update(RentalDTO rentalDTO) throws Exception {
+	public RentalDTO update(RentalUpdateDTO rentalDTO) throws Exception {
 		Rental rental = manager.find(Rental.class, rentalDTO.getId());
 		
 		if(rental == null){
@@ -84,8 +85,9 @@ public class RentalEJB {
 		return GetRentalDTO(manager.merge(rental));
 	}
 	
-	public void delete(int id) {
+	public void delete(int id) throws Exception {
 		Rental rental = manager.find(Rental.class, id);
+		if(rental == null) throw new Exception ("Rental of id " + id + " doesn't exist");
 		manager.remove(rental);
 	}
 	
@@ -121,32 +123,12 @@ public class RentalEJB {
 		return rental;
 	}
 	
-	private Rental Merge(RentalDTO rentalDTO, Rental rental) throws Exception{
+	private Rental Merge(RentalUpdateDTO rentalDTO, Rental rental) throws Exception{
 		if(rentalDTO.getId() != rental.getId()){
 			throw new Exception("Rentals' ids don't match");
 		}
 		if(rentalDTO.getDueDate() != null) rental.setDueDate(rentalDTO.getDueDate());
-		if(rentalDTO.getReaderId() != 0) {
-			Reader reader = manager.find(Reader.class, rentalDTO.getReaderId());
-			if(reader == null){
-				throw new Exception("Reader of given id doesn't exist:" + rentalDTO.getReaderId());
-			}
-			rental.setReader(manager.find(Reader.class, rentalDTO.getReaderId()));
-		}
-		if(rentalDTO.getRentalDate() != null) rental.setRentalDate(rentalDTO.getRentalDate());
 		if(rentalDTO.getReturnDate() != null) rental.setReturnDate(rentalDTO.getReturnDate());
-		if(rentalDTO.getVolumeIds() != null){
-	        List<Volume> volumes = rental.getVolumes();
-	        for (Integer volumeId : rentalDTO.getVolumeIds()) {
-	            Volume volume = manager.find(Volume.class, volumeId);
-	            if (volume == null) {
-	                throw new Exception("Volume not found with id: " + volumeId);
-	            }
-	            if(!volumes.contains(volume))
-	            	volumes.add(volume);
-	        }
-	        rental.setVolumes(volumes);
-		}
 		return rental;
 	}
 	

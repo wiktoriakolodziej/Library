@@ -1,6 +1,5 @@
 package pl.library.controller;
 
-import java.sql.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -19,11 +18,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import pl.library.dao.Book;
-import pl.library.dao.Rental;
 import pl.library.dto.BookCreateDTO;
 import pl.library.dto.BookReturnDTO;
 import pl.library.dto.BookUpdateDTO;
-import pl.library.dto.RentalDTO;
 import pl.library.ejb.BookEJB;
 
 @Path("/book")
@@ -61,10 +58,10 @@ public class BookController {
 	}
 	
 	@GET
-	public Response getAll() 
+	public Response getAll(@QueryParam("authorSurname") String surname) 
 	{
 		 try {
-	            List<BookReturnDTO> books = bean.getAll();
+	            List<BookReturnDTO> books = bean.getAll(surname);
 	            return Response.ok(books).build();
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -91,7 +88,12 @@ public class BookController {
 	@DELETE
 	@Path("/{id}")
 	public Response delete(@PathParam("id") int id) {
-		bean.delete(id);
-		return Response.ok().build();
+		try{
+			bean.delete(id);
+			return Response.ok().build();
+		}
+		catch(Exception e){
+			 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+		}
 	}
 }

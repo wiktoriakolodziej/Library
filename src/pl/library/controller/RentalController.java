@@ -19,8 +19,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import pl.library.dao.Rental;
 import pl.library.dto.RentalDTO;
+import pl.library.dto.RentalUpdateDTO;
 import pl.library.ejb.RentalEJB;
 
 
@@ -57,7 +57,7 @@ public class RentalController {
 	}
 	
 	@GET
-	public Response getAll( @QueryParam("delayed") @DefaultValue("false") boolean delayed,
+	public Response getAll(@QueryParam("delayed") @DefaultValue("false") boolean delayed,
 	        @QueryParam("afterRentalDate") Date afterDate,
 	        @QueryParam("beforeRentalDate") Date beforeDate,
 	        @QueryParam("readerId") @DefaultValue("0") int readerId) 
@@ -72,7 +72,7 @@ public class RentalController {
 	}
 	
 	@PUT
-	public Response update(RentalDTO rental) {
+	public Response update(RentalUpdateDTO rental) {
 		try 
 		{
 			RentalDTO result = bean.update(rental);
@@ -80,7 +80,7 @@ public class RentalController {
 		} 
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 	}
@@ -88,8 +88,14 @@ public class RentalController {
 	@DELETE
 	@Path("/{id}")
 	public Response delete(@PathParam("id") int id) {
-		bean.delete(id);
-		return Response.ok().build();
+		try{
+			bean.delete(id);
+			return Response.ok().build();
+		}
+		catch(Exception e){
+			 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+		}
+		
 	}
 	
 }
