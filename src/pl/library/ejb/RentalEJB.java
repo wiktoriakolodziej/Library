@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -15,6 +16,7 @@ import pl.library.dao.Volume;
 import pl.library.dto.RentalDTO;
 import pl.library.dto.RentalUpdateDTO;
 import pl.library.dao.Reader;
+import pl.library.ejb.VolumeEJB;
 
 
 @Stateful
@@ -23,8 +25,16 @@ public class RentalEJB {
 	@PersistenceContext(name="komis")
 	EntityManager manager; 
 	
+	@EJB
+	VolumeEJB bean;
+	
 	
 	public RentalDTO create(RentalDTO rentalDTO)  throws Exception{
+		for(int id : rentalDTO.getVolumeIds()){
+			if(!bean.IsAvailable(id, rentalDTO.getRentalDate(), rentalDTO.getDueDate())){
+				throw new Exception("Volume of id: " + id + "is not available in chosen dates");
+			}
+		}
 		Rental rental = GetRental(rentalDTO);
 	    manager.persist(rental);
 	    return GetRentalDTO(rental);
@@ -80,6 +90,13 @@ public class RentalEJB {
 		if(rental == null){
 			throw new Exception("Rental of given id doesn't exist:" + rentalDTO.getId());
 		}
+		
+		for(Volume volume : rental.getVolumes()){
+			if(!bean.IsAvailable(volume.getId(), rental.getRentalDate(), rentalDTO.getDueDate())){
+				throw new Exception("Volume of id: " + volume.getId() + "is not available in chosen dates");
+			}
+		}
+
 		Merge(rentalDTO, rental);
 		
 		return GetRentalDTO(manager.merge(rental));
