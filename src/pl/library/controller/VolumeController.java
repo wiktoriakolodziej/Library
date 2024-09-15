@@ -7,12 +7,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import pl.library.dao.Volume;
@@ -48,9 +50,9 @@ public class VolumeController {
 	}
 	
 	@GET
-	public Response getAll() {
+	public Response getAll(@QueryParam("available") @DefaultValue("false") boolean available) {
 		try {
-            List<VolumeReturnDTO> volumes = bean.getAllAll();
+            List<VolumeReturnDTO> volumes = bean.getAllAll(available);
             return Response.ok(volumes).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,5 +117,17 @@ public class VolumeController {
 			 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
 	}	
+	
+	@GET
+	@Path("/available")
+	public Response getAvailable() {
+		try {
+            List<VolumeReturnDTO> volumes = bean.getAvailable();
+            return Response.ok(volumes).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }		
+	}
 }
 
