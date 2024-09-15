@@ -148,6 +148,14 @@ public class RentalEJB {
         
         rentalDTO.setReaderId(rental.getReader().getId());
 		return rentalDTO;
-	}
 
+	}
+	
+	public void testReader(){
+		Reader reader = new Reader();
+		reader.setReaderName("domi");
+		reader.setReaderSurname("domi");
+		reader.setBirthDate(Date.from(Instant.now()));
+		manager.persist(reader);
+	}
 }

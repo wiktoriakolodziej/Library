@@ -98,4 +98,11 @@ public class RentalController {
 		
 	}
 	
+	
+	@GET
+	@Path("/testReader")
+	public void testReader(){
+		bean.testReader();
+	}
+	
 }
