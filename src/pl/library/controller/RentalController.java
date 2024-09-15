@@ -19,8 +19,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import pl.library.dao.Rental;
 import pl.library.dto.RentalDTO;
+import pl.library.dto.RentalUpdateDTO;
 import pl.library.ejb.RentalEJB;
 
 
@@ -37,7 +37,7 @@ public class RentalController {
 	@POST
 	public Response create(RentalDTO rental) {
 		 try {
-            Rental createdRental = bean.create(rental);
+            RentalDTO createdRental = bean.create(rental);
             return Response.status(Response.Status.CREATED).entity(createdRental).build();
 	     } 
 		 catch (Exception e) {
@@ -50,20 +50,20 @@ public class RentalController {
 	@GET
 	@Path("/{id}")
 	public Response getRentalById(@PathParam("id") int id) { 
-		Rental result = bean.get(id);
+		RentalDTO result = bean.get(id);
 		if(result == null) 
 			return Response.status(Response.Status.NOT_FOUND).build();
 		return Response.ok(bean.get(id)).build();
 	}
 	
 	@GET
-	public Response getAll( @QueryParam("delayed") @DefaultValue("false") boolean delayed,
+	public Response getAll(@QueryParam("delayed") @DefaultValue("false") boolean delayed,
 	        @QueryParam("afterRentalDate") Date afterDate,
 	        @QueryParam("beforeRentalDate") Date beforeDate,
 	        @QueryParam("readerId") @DefaultValue("0") int readerId) 
 	{
 		 try {
-	            List<Rental> rentals = bean.getAll(delayed, afterDate, beforeDate, readerId);
+	            List<RentalDTO> rentals = bean.getAll(delayed, afterDate, beforeDate, readerId);
 	            return Response.ok(rentals).build();
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -72,15 +72,15 @@ public class RentalController {
 	}
 	
 	@PUT
-	public Response update(RentalDTO rental) {
+	public Response update(RentalUpdateDTO rental) {
 		try 
 		{
-			Rental result = bean.update(rental);
+			RentalDTO result = bean.update(rental);
 			return Response.ok(result).build();
 		} 
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 	}
@@ -88,13 +88,21 @@ public class RentalController {
 	@DELETE
 	@Path("/{id}")
 	public Response delete(@PathParam("id") int id) {
-		bean.delete(id);
-		return Response.ok().build();
+		try{
+			bean.delete(id);
+			return Response.ok().build();
+		}
+		catch(Exception e){
+			 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+		}
+		
 	}
 	
+	
 	@GET
-	@Path("/test")
-	public Rental test(){
-		return bean.test();
+	@Path("/testReader")
+	public void testReader(){
+		bean.testReader();
 	}
+	
 }

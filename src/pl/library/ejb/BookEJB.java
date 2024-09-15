@@ -1,30 +1,22 @@
 package pl.library.ejb;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
-import javax.persistence.OneToMany;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
-import java.time.Instant;
-import java.util.Date;
-import java.util.HashSet;
-
-import javax.ejb.Stateful;
-
 import pl.library.dao.Book;
-import pl.library.dao.Reader;
-import pl.library.dao.Rental;
 import pl.library.dao.Volume;
 import pl.library.dto.BookCreateDTO;
 import pl.library.dto.BookReturnDTO;
 import pl.library.dto.BookUpdateDTO;
 import pl.library.dto.BookVolumeReturnDTO;
-import pl.library.dto.RentalDTO;
 
 @Stateful
 public class BookEJB {
@@ -47,13 +39,21 @@ public class BookEJB {
 	} 
 	
 
-	public List<BookReturnDTO> getAll(){
+	public List<BookReturnDTO> getAll(String surname){
 		
-		String queryString = "SELECT v FROM Book v";		
-		Query query = manager.createQuery(queryString);		
+		String queryString = "SELECT v FROM Book v WHERE 1=1";
+		if(surname != null && !surname.isEmpty()){
+			 queryString += " AND v.authorSurname = :surname";
+		}
+		Query query = manager.createQuery(queryString);	
+		if(surname != null && !surname.isEmpty()){
+			query.setParameter("surname", surname);
+		}
 		
 		@SuppressWarnings("unchecked")		
 		List<Book> bookList = query.getResultList();
+		
+		
 		List<BookReturnDTO> bookListDTO = new ArrayList<BookReturnDTO>();
 		for(Book b : bookList)  {
 			BookReturnDTO bookReturnDTO = new BookReturnDTO();
@@ -136,8 +136,9 @@ public class BookEJB {
         return ret;
 	}
 	
-	public void delete(int id) {
+	public void delete(int id) throws Exception {
 		Book book = manager.find(Book.class, id);
+		if(book == null) throw new Exception ("Book of id " + id + " doesn't exist");
 		manager.remove(book);
 	}
 

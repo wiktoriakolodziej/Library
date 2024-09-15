@@ -1,7 +1,9 @@
 package pl.library.dao;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -35,7 +37,7 @@ public class Reader {
 	@Column(name = "penalty")
 	private float penalty;
 	
-	@OneToMany(mappedBy = "reader")
+	@OneToMany(mappedBy = "reader", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
 	Set<Rental> rentals;
 	
 	
@@ -56,7 +58,8 @@ public class Reader {
 	
 	public float getPenalty() {return penalty;}
 	public void setPenalty(float penalty) { this.penalty = penalty;}
-
-	 
-	    
+	
+	public Set<Rental> getRentals() {return rentals;}
+	public void setRentals(Set<Rental> rentals){ this.rentals = rentals;}
+   
 }

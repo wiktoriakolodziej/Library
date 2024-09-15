@@ -13,6 +13,7 @@ import javax.persistence.Query;
 import pl.library.dao.Rental;
 import pl.library.dao.Volume;
 import pl.library.dto.RentalDTO;
+import pl.library.dto.RentalUpdateDTO;
 import pl.library.dao.Reader;
 
 
@@ -22,36 +23,18 @@ public class RentalEJB {
 	@PersistenceContext(name="komis")
 	EntityManager manager; 
 	
-	public Rental create(RentalDTO rentalDTO)  throws Exception{
-		 Reader reader = manager.find(Reader.class, rentalDTO.getReaderId());
-	        if (reader == null) {
-	            throw new Exception("Reader not found with id: " + rentalDTO.getReaderId());
-	        }
-	        
-	        List<Volume> volumes = new ArrayList<Volume>();
-	        for (Integer volumeId : rentalDTO.getVolumeIds()) {
-	            Volume volume = manager.find(Volume.class, volumeId);
-	            if (volume == null) {
-	                throw new Exception("Volume not found with id: " + volumeId);
-	            }
-	            volumes.add(volume);
-	        }
-
-	        Rental rental = new Rental();
-	        rental.setRentalDate(rentalDTO.getRentalDate());
-	        rental.setReturnDate(rentalDTO.getReturnDate());
-	        rental.setDueDate(rentalDTO.getDueDate());
-	        rental.setReader(reader);
-	        rental.setVolumes(volumes);
-	        
-	        manager.persist(rental);
-	        return rental;
+	
+	public RentalDTO create(RentalDTO rentalDTO)  throws Exception{
+		Rental rental = GetRental(rentalDTO);
+	    manager.persist(rental);
+	    return GetRentalDTO(rental);
 	} 
 	
-	public Rental get(int id) {
-		return manager.find(Rental.class, id);
+	public RentalDTO get(int id) {
+		return GetRentalDTO(manager.find(Rental.class, id));
 	}
-	public List<Rental> getAll(boolean delayed, Date afterDate, Date beforeDate, int readerId) {
+	
+	public List<RentalDTO> getAll(boolean delayed, Date afterDate, Date beforeDate, int readerId) {
 		String queryString = "SELECT r FROM Rental r WHERE 1=1";
 		 
 		if (delayed) {
@@ -83,72 +66,96 @@ public class RentalEJB {
 	    }
 	    
 	    @SuppressWarnings("unchecked")
-	    List<Rental> resultList = query.getResultList();
-	    return resultList;
+	    List<Rental> queryResult = query.getResultList();
+	    List<RentalDTO> result = new ArrayList<RentalDTO>();
+	    for(Rental rental : queryResult){
+	    	result.add(GetRentalDTO(rental));
+	    }
+	    return result;
 }
 	
-	public Rental update(RentalDTO rentalDTO) throws Exception {
-		if(rentalDTO.getId() == 0){
-			throw new Exception("Rental id was not provided");
-		}
+	public RentalDTO update(RentalUpdateDTO rentalDTO) throws Exception {
 		Rental rental = manager.find(Rental.class, rentalDTO.getId());
+		
 		if(rental == null){
 			throw new Exception("Rental of given id doesn't exist:" + rentalDTO.getId());
 		}
-		if(rentalDTO.getDueDate() != null) rental.setDueDate(rentalDTO.getDueDate());
-		if(rentalDTO.getReaderId() != 0) {
-			Reader reader = manager.find(Reader.class, rentalDTO.getReaderId());
-			if(reader == null){
-				throw new Exception("Reader of given id doesn't exist:" + rentalDTO.getReaderId());
-			}
-			rental.setReader(manager.find(Reader.class, rentalDTO.getReaderId()));
-		}
-		if(rentalDTO.getRentalDate() != null) rental.setRentalDate(rentalDTO.getRentalDate());
-		if(rentalDTO.getReturnDate() != null) rental.setReturnDate(rentalDTO.getReturnDate());
-		if(rentalDTO.getVolumeIds() != null){
-	        List<Volume> volumes = rental.getVolumes();
-	        for (Integer volumeId : rentalDTO.getVolumeIds()) {
-	            Volume volume = manager.find(Volume.class, volumeId);
-	            if (volume == null) {
-	                throw new Exception("Volume not found with id: " + volumeId);
-	            }
-	            if(!volumes.contains(volume))
-	            	volumes.add(volume);
-	        }
-	        rental.setVolumes(volumes);
-		}
-		return manager.merge(rental);
+		Merge(rentalDTO, rental);
+		
+		return GetRentalDTO(manager.merge(rental));
 	}
-	public void delete(int id) {
+	
+	public void delete(int id) throws Exception {
 		Rental rental = manager.find(Rental.class, id);
+		if(rental == null) throw new Exception ("Rental of id " + id + " doesn't exist");
 		manager.remove(rental);
 	}
 	
-	public Rental test(){
-		Rental x = new Rental();
-		x.setDueDate(Date.from(Instant.now()));
-		x.setRentalDate(Date.from(Instant.now()));
-		x.setReturnDate(Date.from(Instant.now()));
+	
+	
+	private Rental GetRental (RentalDTO rentalDTO) throws Exception{
+		if(rentalDTO == null) return null;
+		Rental rental = new Rental();
+		rental.setId(rentalDTO.getId());
+		rental.setDueDate(rentalDTO.getDueDate());
+		
+		Reader reader = manager.find(Reader.class, rentalDTO.getReaderId());
+        if (reader == null) {
+            throw new Exception("Reader not found with id: " + rentalDTO.getReaderId());
+        }
+		rental.setReader(reader);
+		
+		rental.setRentalDate(rentalDTO.getRentalDate());
+		rental.setReturnDate(rentalDTO.getReturnDate());
+		
+		if(rentalDTO.getVolumeIds() == null){
+			throw new Exception("Volumes can't be empty");
+		}
+        List<Volume> volumes = new ArrayList<Volume>();
+        for (Integer volumeId : rentalDTO.getVolumeIds()) {
+            Volume volume = manager.find(Volume.class, volumeId);
+            if (volume == null) {
+                throw new Exception("Volume not found with id: " + volumeId);
+            }
+            volumes.add(volume);
+        }		
+		rental.setVolumes(volumes);
+		return rental;
+	}
+	
+	private Rental Merge(RentalUpdateDTO rentalDTO, Rental rental) throws Exception{
+		if(rentalDTO.getId() != rental.getId()){
+			throw new Exception("Rentals' ids don't match");
+		}
+		if(rentalDTO.getDueDate() != null) rental.setDueDate(rentalDTO.getDueDate());
+		if(rentalDTO.getReturnDate() != null) rental.setReturnDate(rentalDTO.getReturnDate());
+		return rental;
+	}
+	
+	private RentalDTO GetRentalDTO(Rental rental){
+		if(rental == null) return null;
+		RentalDTO rentalDTO = new RentalDTO();
+		rentalDTO.setId(rental.getId());
+		rentalDTO.setDueDate(rental.getDueDate());
+		rentalDTO.setRentalDate(rental.getRentalDate());
+		rentalDTO.setReturnDate(rental.getReturnDate());
+		
+        List<Integer> volumes = new ArrayList<Integer>();
+        for (Volume volume : rental.getVolumes()) {
+            volumes.add(volume.getId());
+        }
+        rentalDTO.setVolumeIds(volumes);
+        
+        rentalDTO.setReaderId(rental.getReader().getId());
+		return rentalDTO;
+
+	}
+	
+	public void testReader(){
 		Reader reader = new Reader();
 		reader.setReaderName("domi");
 		reader.setReaderSurname("domi");
 		reader.setBirthDate(Date.from(Instant.now()));
 		manager.persist(reader);
-		x.setReader(reader);
-		Volume y = new Volume();
-		y.setYearOfPublication(1);
-		y.setPages(1);
-		manager.persist(y);
-		Volume z = new Volume();
-		z.setYearOfPublication(2);
-		z.setPages(2);
-		manager.persist(z);
-		List<Volume> list = new ArrayList<Volume>();
-		list.add(y);
-		list.add(z);
-		x.setVolumes(list);
-		manager.persist(x);
-		return x;
 	}
-
 }

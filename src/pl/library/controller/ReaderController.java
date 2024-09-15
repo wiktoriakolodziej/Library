@@ -17,6 +17,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import pl.library.dao.Reader;
+import pl.library.dto.ReaderDTO;
 import pl.library.ejb.ReaderEJB;
 
 @Path("/reader")
@@ -24,7 +25,6 @@ import pl.library.ejb.ReaderEJB;
 @Produces({ "application/json" })
 public class ReaderController {
 
-	
     @EJB
     ReaderEJB bean;
 
@@ -32,9 +32,9 @@ public class ReaderController {
     EntityManager manager;
 
     @POST
-    public Response create(Reader reader) {
+    public Response create(ReaderDTO reader) {
         try {
-            Reader createdReader = bean.create(reader);
+            ReaderDTO createdReader = bean.create(reader);
             return Response.status(Response.Status.CREATED).entity(createdReader).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -56,7 +56,7 @@ public class ReaderController {
                            @QueryParam("surname") String surname,
                            @QueryParam("minPenalty") @DefaultValue("0") float minPenalty) {
         try {
-            List<Reader> readers = bean.getAll(name, surname, minPenalty);
+            List<ReaderDTO> readers = bean.getAll(name, surname, minPenalty);
             return Response.ok(readers).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,22 +65,26 @@ public class ReaderController {
     }
 
     @PUT
-    public Response update(Reader reader) {
-    	
+    public Response update( ReaderDTO readerDTO) {
         try {
-            Reader result = bean.update(reader);
+            ReaderDTO result = bean.update(readerDTO);
             return Response.ok(result).build();
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
 
     @DELETE
     @Path("/{id}")
     public Response delete(@PathParam("id") int id) {
-        bean.delete(id);
-        return Response.ok().build();
+    	try{
+			bean.delete(id);
+			return Response.ok().build();
+		}
+		catch(Exception e){
+			 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+		}
     }
 
     @GET
