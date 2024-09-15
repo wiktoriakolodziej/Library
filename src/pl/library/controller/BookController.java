@@ -38,26 +38,20 @@ public class BookController {
 	@PersistenceContext(name="komis")
 	EntityManager manager;
 	
-	@POST
-	public Response create(BookCreateDTO book) {
-		 try {
-            Book createdBook = bean.create(book);
-            return Response.status(Response.Status.CREATED).entity(createdBook).build();
-	     } 
-		 catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-		 }
-	}
 	
 	@GET
 	@Path("/{id}")
 	public Response getBookById(@PathParam("id") int id) { 
-		BookReturnDTO result = bean.get(id);
-		if(result == null) 
-			return Response.status(Response.Status.NOT_FOUND).build();
-		return Response.ok(bean.get(id)).build();
+		try{
+			BookReturnDTO result = bean.get(id);
+			return Response.ok(bean.get(id)).entity(result).build();
+		}
+		catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+		}
 	}
+	
 	
 	@GET
 	public Response getAll() 
@@ -71,11 +65,24 @@ public class BookController {
 	        }
 	}
 	
+	
+	@POST
+	public Response create(BookCreateDTO book) {
+		 try {
+			 BookReturnDTO createdBook = bean.create(book);
+            return Response.status(Response.Status.CREATED).entity(createdBook).build();
+	     } 
+		 catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+		 }
+	}
+	
+	
 	@PUT
 	public Response update(BookUpdateDTO book) {
 		try 
 		{
-
 			BookUpdateDTO result = bean.update(book);
 			
 			return Response.ok(result).build();
@@ -83,9 +90,10 @@ public class BookController {
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-			return Response.status(Response.Status.BAD_REQUEST).build();
+			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
 	}
+	
 	
 	@DELETE
 	@Path("/{id}")

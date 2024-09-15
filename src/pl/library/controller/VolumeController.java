@@ -20,8 +20,7 @@ import javax.ws.rs.core.Response;
 
 import pl.library.dao.Rental;
 import pl.library.dao.Volume;
-import pl.library.dto.VolumeDTO;
-import pl.library.dto.VolumeIsAvailable;
+import pl.library.dto.VolumeCreateDTO;
 import pl.library.dto.VolumeReturnDTO;
 import pl.library.dto.VolumeUpdateDTO;
 import pl.library.ejb.VolumeEJB;
@@ -38,19 +37,21 @@ public class VolumeController {
 	@PersistenceContext(name="komis")
 	EntityManager manager;
 	
-	@POST
-	public Response create(VolumeDTO volume) {
-		 try {
-	         Volume createdVolume = bean.create(volume);
-	         //return Response.status(Response.Status.CREATED).entity(createdVolume).build();
-	         return Response.status(Response.Status.CREATED).build();
-		 } 
-		 catch (Exception e) {
-	           e.printStackTrace();
-	           return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-		 }
+	
+	@GET
+	@Path("/{id}")
+	public Response getVolumeById(@PathParam("id") int id) { 
+		try{
+			VolumeReturnDTO result = bean.get(id);
+			return Response.ok(bean.get(id)).build();
 
+		}
+		catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
 	}
+	
 	
 	@GET
 	public Response getAll() {
@@ -62,7 +63,6 @@ public class VolumeController {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }		
 	}
-	
 	
 	
 	//public Response getAll(@QueryParam("bookId") @DefaultValue("0") int bookId) {
@@ -79,15 +79,16 @@ public class VolumeController {
 	}
 	
 	
-	
-	@GET
-	@Path("/{id}")
-	public Response getVolumeById(@PathParam("id") int id) { 
-		VolumeReturnDTO result = bean.get(id);
-		//Volume result = bean.get(id);
-		if(result == null) 
-			return Response.status(Response.Status.NOT_FOUND).build();
-		return Response.ok(bean.get(id)).build();
+	@POST
+	public Response create(VolumeCreateDTO volume) {
+		 try {
+	         VolumeReturnDTO createdVolume = bean.create(volume);
+	         return Response.status(Response.Status.CREATED).entity(createdVolume).build();
+		 } 
+		 catch (Exception e) {
+	           e.printStackTrace();
+	           return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+		 }
 	}
 	
 	
@@ -95,17 +96,16 @@ public class VolumeController {
 	public Response update(VolumeUpdateDTO volume) {
 		try 
 		{
-			VolumeUpdateDTO result = bean.update(volume);
-			
-			//Volume result = bean.update(volume);
+			VolumeUpdateDTO result = bean.update(volume);			
 			return Response.ok(result).build();
 		} 
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-			return Response.status(Response.Status.BAD_REQUEST).build();
+			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
 	}
+	
 	
 	@DELETE
 	@Path("/{id}")
@@ -117,26 +117,8 @@ public class VolumeController {
 		catch (Exception e) 
 		{
 			e.printStackTrace();
-			return Response.status(Response.Status.BAD_REQUEST).build();
+			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
 	}
-	
-	@GET
-	@Path("/isAvailable")
-	public Response IsAvailable(VolumeIsAvailable volume){
-		try {
-		    System.out.println("Jestem przed wywolaniem ejb w kontrolerze");
-			bean.IsAvailable(volume);
-		    System.out.println("Jestem po wywolaniu ejb w kontrolerze");
-
-			return Response.ok().build();
-		}
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
-	}
-
 }
 

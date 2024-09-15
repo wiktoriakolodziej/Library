@@ -7,13 +7,13 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 import pl.library.dao.Volume.BookCover;
-import pl.library.dao.Volume.Conditionn;
+import pl.library.dao.Volume.Condition;
 
-public class VolumeDTO {
+public class VolumeCreateDTO {
 	int yearOfPublication;
 	BookCover bookCover;
-	int pagess;
-	Conditionn conditionn;
+	int pages;
+	Condition condition;
 	int bookId;
 	
 	 
@@ -26,11 +26,11 @@ public class VolumeDTO {
 	}
 	
 	public int getPagess() {
-        return pagess;
+        return pages;
     }
 	
 	public void setPagess(int p){
-		this.pagess = p;
+		this.pages = p;
 	}
 	
 	public int getBookId() {
@@ -49,12 +49,12 @@ public class VolumeDTO {
 		this.bookCover = c;
 	}
 	
-	public Conditionn getCondition(){
-		return conditionn;
+	public Condition getCondition(){
+		return condition;
 	}
 	
-	public void setCondition(Conditionn con){
-		this.conditionn = con;
+	public void setCondition(Condition con){
+		this.condition = con;
 	}
 
-}
+} 

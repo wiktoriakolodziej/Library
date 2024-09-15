@@ -12,29 +12,24 @@ import pl.library.dao.Book;
 import pl.library.dao.Rental;
 import pl.library.dao.Volume;
 import pl.library.dto.VolumeBookReturnDTO;
-import pl.library.dto.VolumeDTO;
-import pl.library.dto.VolumeIsAvailable;
+import pl.library.dto.VolumeCreateDTO;
 import pl.library.dto.VolumeReturnDTO;
 import pl.library.dto.VolumeUpdateDTO; 
 
 @Stateful
 public class VolumeEJB {
 	@PersistenceContext(name="komis")
-	EntityManager manager;
+	EntityManager manager;	
 	
-	public VolumeReturnDTO get(int id) {
-		
+	
+	public VolumeReturnDTO get(int id) throws Exception {	
 		Volume v = manager.find(Volume.class, id);
-		
-		VolumeReturnDTO vr = new VolumeReturnDTO();
-		vr.setBookCover(v.getBookCover());
-		vr.setCondition(v.getCondition());
-		vr.setId(v.getId());
-		vr.setPages(v.getPages());
-		vr.setYearOfPublication(v.getYearOfPublication());
-		
-		return vr;
+		if (v == null) {
+	            throw new Exception("Volume not found with id: " + id);
+	    }
+		return ConvertVolumeToVolumeReturnDto(v);		
 	}
+	
 	
 	public List<VolumeReturnDTO> getAllAll(){
 		String queryString = "SELECT v FROM Volume v";
@@ -43,70 +38,62 @@ public class VolumeEJB {
 	    List<Volume> resultList = query.getResultList();
 		List<VolumeReturnDTO> vrDTO = new ArrayList<VolumeReturnDTO>();
 		for(Volume v : resultList){
-			VolumeReturnDTO vr = new VolumeReturnDTO();
-			vr.setBookCover(v.getBookCover());
-			vr.setCondition(v.getCondition());
-			vr.setId(v.getId());
-			vr.setPages(v.getPages());
-			vr.setYearOfPublication(v.getYearOfPublication());
-			
+			VolumeReturnDTO vr = ConvertVolumeToVolumeReturnDto(v);
 			Book b = v.getBook();
-			VolumeBookReturnDTO vbr = new VolumeBookReturnDTO();
-			vbr.setAuthorName(b.getAuthorName());
-			vbr.setAuthorSurname(b.getAuthorSurname());
-			vbr.setDescription(b.getDescription());
-			vbr.setId(b.getId());
-			vbr.setTitle(b.getTitle());
-			vbr.setVersion(b.getVersion());
-			
+			VolumeBookReturnDTO vbr = ConvertBookToVolumeBookReturnDTO(b);
 			vr.setBook(vbr);
 			vrDTO.add(vr);		
 		}
 	    return vrDTO;
 	}
 	
-
-	public List<VolumeReturnDTO> getAll(int bookId){
-		
+	
+	public List<VolumeReturnDTO> getAll(int bookId) throws Exception{
+		Book book = manager.find(Book.class, bookId); //zostawic?
+		if (book == null) {
+	            throw new Exception("Book not found with id: " + bookId);
+	    }		
 		String queryString = "SELECT v FROM Volume v";
 		if (bookId != 0) {
 		    queryString += " WHERE v.book.id = :bookId";
-		}
-		
+		}		
 		Query query = manager.createQuery(queryString);
 	    
 	    if (bookId != 0) {
 	        query.setParameter("bookId", bookId);
-	    }		
-		
+	    }				
 		@SuppressWarnings("unchecked")
 	    List<Volume> resultList = query.getResultList();
 		List<VolumeReturnDTO> vrDTO = new ArrayList<VolumeReturnDTO>();
 		for(Volume v : resultList){
-			VolumeReturnDTO vr = new VolumeReturnDTO();
-			vr.setBookCover(v.getBookCover());
-			vr.setCondition(v.getCondition());
-			vr.setId(v.getId());
-			vr.setPages(v.getPages());
-			vr.setYearOfPublication(v.getYearOfPublication());
-			
+			VolumeReturnDTO vr = ConvertVolumeToVolumeReturnDto(v);
 			Book b = v.getBook();
-			VolumeBookReturnDTO vbr = new VolumeBookReturnDTO();
-			vbr.setAuthorName(b.getAuthorName());
-			vbr.setAuthorSurname(b.getAuthorSurname());
-			vbr.setDescription(b.getDescription());
-			vbr.setId(b.getId());
-			vbr.setTitle(b.getTitle());
-			vbr.setVersion(b.getVersion());
-			
+			VolumeBookReturnDTO vbr = ConvertBookToVolumeBookReturnDTO (b);
 			vr.setBook(vbr);
 			vrDTO.add(vr);			
 		}
-	    return vrDTO;
-		
+	    return vrDTO;		
 	}
 	
-	public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
+	
+	public VolumeReturnDTO create(VolumeCreateDTO volumeDTO)  throws Exception{
+
+		 Book book = manager.find(Book.class, volumeDTO.getBookId());	    
+	     if (book == null) {
+	         throw new Exception("Book not found with id: " + volumeDTO.getBookId());
+	     }        
+	     Volume volume = new Volume();
+	     volume.setBook(book);
+	     volume.setPages(volumeDTO.getPagess());
+	     volume.setYearOfPublication(volumeDTO.getYearOfPublication());
+		 volume.setBookCover(volumeDTO.getBookCover());
+		 volume.setCondition(volumeDTO.getCondition());
+	     manager.persist(volume);
+	     return ConvertVolumeToVolumeReturnDto(volume);
+	} 	
+	
+	
+public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
 		
 		Volume existingVolume = manager.find(Volume.class, volume.getId());
 		
@@ -146,11 +133,15 @@ public class VolumeEJB {
 	public void delete(int id) throws Exception {
 		try {
 		    Volume volume = manager.find(Volume.class, id);
+	        if (volume == null) {
+	            throw new Exception("Volume not found with id: " + id);
+	        }
 		    Book book = volume.getBook();
-		    if (book != null) {
-		        book.getVolumes().remove(volume);
-		    }
-		    System.out.println("Volumin:" + id + ", of " + volume.getBook().getId());
+	        if (book == null) {
+	            throw new Exception("Book not found with id: ");
+	        }
+	        book.getVolumes().remove(volume);
+		    //System.out.println("Volumin:" + id + ", of " + volume.getBook().getId());
 		    manager.remove(volume);
 		}
 		catch (Exception e) {
@@ -160,33 +151,35 @@ public class VolumeEJB {
 	}
 	
 	
-	public Volume create(VolumeDTO volumeDTO)  throws Exception{
-
-		 Book book = manager.find(Book.class, volumeDTO.getBookId());	    
-	        if (book == null) {
-	            throw new Exception("Book not found with id: " + volumeDTO.getBookId());
-	        }
-	        
-	        Volume volume = new Volume();
-	        volume.setBook(book);
-	        volume.setPages(volumeDTO.getPagess());
-	        volume.setYearOfPublication(volumeDTO.getYearOfPublication());
-			volume.setBookCover(volumeDTO.getBookCover());
-			volume.setCondition(volumeDTO.getCondition());
-	        manager.persist(volume);
-	        return volume;
-	} 	
+	private VolumeReturnDTO ConvertVolumeToVolumeReturnDto(Volume v){
+		VolumeReturnDTO vr = new VolumeReturnDTO();
+		vr.setBookCover(v.getBookCover());
+		vr.setCondition(v.getCondition());
+		vr.setId(v.getId());
+		vr.setPages(v.getPages());
+		vr.setYearOfPublication(v.getYearOfPublication());
+		return vr;
+	}
 	
-	public boolean IsAvailable(VolumeIsAvailable volumeIsAvailable) throws Exception{
-	    System.out.println("Jestem na poczatku w ejb");
-	    int id = volumeIsAvailable.getId();
-	    Date rentalDate = volumeIsAvailable.getRentalDate();
-	    Date dueDate = volumeIsAvailable.getDueDate();
-	    
+	
+	
+	private VolumeBookReturnDTO ConvertBookToVolumeBookReturnDTO(Book b){
+		VolumeBookReturnDTO vbr = new VolumeBookReturnDTO();
+		vbr.setAuthorName(b.getAuthorName());
+		vbr.setAuthorSurname(b.getAuthorSurname());
+		vbr.setDescription(b.getDescription());
+		vbr.setId(b.getId());
+		vbr.setTitle(b.getTitle());
+		vbr.setVersion(b.getVersion());
+		return vbr;
+	}
 
-	    Volume volume = manager.find(Volume.class, volumeIsAvailable.getId());
+	
+	public boolean IsAvailable(int id, Date rentalDate, Date dueDate) throws Exception{
+
+	    Volume volume = manager.find(Volume.class, id);
         if (volume == null) {
-            throw new Exception("Volume not found with id: " + volumeIsAvailable.getId());
+            throw new Exception("Volume not found with id: " + id);
         }
         if (rentalDate == null) {
             throw new Exception("Rental date is required");

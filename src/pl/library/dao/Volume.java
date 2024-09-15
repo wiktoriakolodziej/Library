@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Volume {
 	
 	public enum BookCover{paperback, hardcover;}
-	public enum Conditionn{bad, average, good;}
+	public enum Condition{bad, average, good;}
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,9 +30,9 @@ public class Volume {
 	@Enumerated(EnumType.STRING)
 	BookCover bookCover;
 	@Column(updatable = false, nullable = false)
-	int pagess;
+	int pages;
 	@Enumerated(EnumType.STRING)
-	Conditionn conditionn;	
+	Condition condition;	
 	
 	@ManyToOne
 	@JoinColumn(name = "book_id")
@@ -47,13 +47,13 @@ public class Volume {
 	public BookCover getBookCover(){return bookCover;}
 	public void setBookCover(BookCover cover){this.bookCover = cover;}
 	
-	public int getPages(){return pagess;}
-	public void setPages(int pagess){this.pagess = pagess;}
+	public int getPages(){return pages;}
+	public void setPages(int pagess){this.pages = pagess;}
 	
 	public Book getBook(){return book;}
 	public void setBook(Book book){this.book = book;}
 	
-	public Conditionn getCondition(){return conditionn;}
-	public void setCondition(Conditionn conditionn){this.conditionn = conditionn;}
+	public Condition getCondition(){return condition;}
+	public void setCondition(Condition conditionn){this.condition = conditionn;}
 
 }
