@@ -24,20 +24,16 @@ public class BookEJB {
 	EntityManager manager;
 	
 	
-	public Book create(BookCreateDTO bookDTO){
-	        
-	        Book book = new Book();
-	        book.setAuthorName(bookDTO.getAuthorName());
-	        book.setAuthorSurname(bookDTO.getAuthorSurname());
-	        book.setTitle(bookDTO.getTitle());
-	        book.setVersion(bookDTO.getVersion());
-	        book.setDescription(bookDTO.getDescription());
-	        // setVolumes?
-	        
-	        manager.persist(book);
-	        return book;
-	} 
+	public BookReturnDTO get(int id) throws Exception {
+		Book b = manager.find(Book.class, id);
+		if (b == null) {
+	            throw new Exception("Book not found with id: " + id);
+	    }
+		return ConvertBookToReturnDto(b);		
+	}
 	
+	
+
 
 	public List<BookReturnDTO> getAll(String surname){
 		
@@ -55,49 +51,35 @@ public class BookEJB {
 		
 		
 		List<BookReturnDTO> bookListDTO = new ArrayList<BookReturnDTO>();
-		for(Book b : bookList)  {
-			BookReturnDTO bookReturnDTO = new BookReturnDTO();
-			bookReturnDTO.setId(b.getId());
-			bookReturnDTO.setAuthorName(b.getAuthorName());
-			bookReturnDTO.setAuthorSurname(b.getAuthorSurname());
-			bookReturnDTO.setTitle(b.getTitle());
-			bookReturnDTO.setDescription(b.getDescription());
-			bookReturnDTO.setVersion(b.getVersion());
-			
+		for(Book b : bookList)  {					
+			BookReturnDTO bookReturnDTO = ConvertBookToReturnDto(b);			
 			Set<Volume> vols = b.getVolumes();
 			Set<BookVolumeReturnDTO> volsDTO = new HashSet<BookVolumeReturnDTO>();
 			for(Volume v : vols){
-				BookVolumeReturnDTO bvrDTO = new BookVolumeReturnDTO();
-				bvrDTO.setId(v.getId());
-				bvrDTO.setCondition(v.getCondition());
-				bvrDTO.setPages(v.getPages());
-				bvrDTO.setYearOfPublication(v.getYearOfPublication());
-				bvrDTO.setBookCover(v.getBookCover());
+				BookVolumeReturnDTO bvrDTO = ConvertVolumeToBookVolumeReturnDto(v);
 				volsDTO.add(bvrDTO);
 			}
 			bookReturnDTO.setVolumes(volsDTO);
 			bookListDTO.add(bookReturnDTO);
 		}
-
 		return bookListDTO;
 	}
 	
+	
+	public BookReturnDTO create(BookCreateDTO bookDTO){
 
+	        Book book = new Book();
+	        book.setAuthorName(bookDTO.getAuthorName());
+	        book.setAuthorSurname(bookDTO.getAuthorSurname());
+	        book.setTitle(bookDTO.getTitle());
+	        book.setVersion(bookDTO.getVersion());
+	        book.setDescription(bookDTO.getDescription());	        
+	        manager.persist(book);
+	        return ConvertBookToReturnDto(book);
+	} 
 	
-	public BookReturnDTO get(int id) {
-		Book b = manager.find(Book.class, id);
-		BookReturnDTO bookReturnDTO = new BookReturnDTO();
-		bookReturnDTO.setId(b.getId());
-		bookReturnDTO.setAuthorName(b.getAuthorName());
-		bookReturnDTO.setAuthorSurname(b.getAuthorSurname());
-		bookReturnDTO.setTitle(b.getTitle());
-		bookReturnDTO.setDescription(b.getDescription());
-		bookReturnDTO.setVersion(b.getVersion());
-		return bookReturnDTO;
-		//return manager.find(Book.class, id);
-	}
 	
-	public BookUpdateDTO update(BookUpdateDTO book) {
+	public BookUpdateDTO update(BookUpdateDTO book)  {
 		Book existingBook = manager.find(Book.class, book.getId());
 		
 		if (existingBook == null) {
@@ -138,8 +120,33 @@ public class BookEJB {
 	
 	public void delete(int id) throws Exception {
 		Book book = manager.find(Book.class, id);
-		if(book == null) throw new Exception ("Book of id " + id + " doesn't exist");
+		if (book == null) {
+            throw new EntityNotFoundException("Book not found with id: " + id);
+        }
+
 		manager.remove(book);
+	}
+	
+	
+	private BookVolumeReturnDTO ConvertVolumeToBookVolumeReturnDto(Volume v){
+		BookVolumeReturnDTO bvrDTO = new BookVolumeReturnDTO();
+		bvrDTO.setId(v.getId());
+		bvrDTO.setCondition(v.getCondition());
+		bvrDTO.setPages(v.getPages());
+		bvrDTO.setYearOfPublication(v.getYearOfPublication());
+		bvrDTO.setBookCover(v.getBookCover());
+		return bvrDTO;
+	}
+	
+	private BookReturnDTO ConvertBookToReturnDto(Book b){
+		BookReturnDTO bookReturnDTO = new BookReturnDTO();
+		bookReturnDTO.setId(b.getId());
+		bookReturnDTO.setAuthorName(b.getAuthorName());
+		bookReturnDTO.setAuthorSurname(b.getAuthorSurname());
+		bookReturnDTO.setTitle(b.getTitle());
+		bookReturnDTO.setDescription(b.getDescription());
+		bookReturnDTO.setVersion(b.getVersion());
+		return bookReturnDTO;
 	}
 
 }

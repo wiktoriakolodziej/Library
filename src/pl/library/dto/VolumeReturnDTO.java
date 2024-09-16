@@ -2,14 +2,14 @@ package pl.library.dto;
 
 import pl.library.dao.Book;
 import pl.library.dao.Volume.BookCover;
-import pl.library.dao.Volume.Conditionn;
+import pl.library.dao.Volume.Condition;
 
 public class VolumeReturnDTO {
 	int id;
 	int yearOfPublication;
 	BookCover bookCover;
-	int pagess;
-	Conditionn conditionn;
+	int pages;
+	Condition condition;
 	VolumeBookReturnDTO book;
 	
 	public int getId(){return id;}
@@ -21,12 +21,12 @@ public class VolumeReturnDTO {
 	public BookCover getBookCover(){return bookCover;}
 	public void setBookCover(BookCover cover){this.bookCover = cover;}
 	
-	public int getPages(){return pagess;}
-	public void setPages(int pagess){this.pagess = pagess;}
+	public int getPages(){return pages;}
+	public void setPages(int pagess){this.pages = pagess;}
 	
 	public VolumeBookReturnDTO getBook(){return book;}
 	public void setBook(VolumeBookReturnDTO book){this.book = book;}
 	
-	public Conditionn getCondition(){return conditionn;}
-	public void setCondition(Conditionn conditionn){this.conditionn = conditionn;}
+	public Condition getCondition(){return condition;}
+	public void setCondition(Condition conditionn){this.condition = conditionn;}
 }
