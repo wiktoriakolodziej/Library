@@ -234,7 +234,6 @@ public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
 		query.setParameter("id", id);
 		query.setParameter("rentalDate", rentalDate);
 		query.setParameter("dueDate", dueDate);
-		query.setParameter("id", id);
 
 	    
 	    @SuppressWarnings("unchecked")
