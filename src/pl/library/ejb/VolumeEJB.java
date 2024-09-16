@@ -1,8 +1,12 @@
 package pl.library.ejb;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
@@ -30,12 +34,48 @@ public class VolumeEJB {
 		return ConvertVolumeToVolumeReturnDto(v);		
 	}
 	
-	
-	public List<VolumeReturnDTO> getAllAll(){
-		String queryString = "SELECT v FROM Volume v";
-		Query query = manager.createQuery(queryString);
-		@SuppressWarnings("unchecked")
-	    List<Volume> resultList = query.getResultList();
+
+	public List<VolumeReturnDTO> getAllAll(boolean available){
+		List<Volume> resultList = new ArrayList<Volume>();
+		if(available){
+
+			String queryString1 = "SELECT v "
+			        + "FROM Volume v "
+			        + "WHERE v.id NOT IN ("
+			        + "    SELECT v2.id "
+			        + "    FROM Rental r "
+			        + "    JOIN r.volumes v2 "
+			        + "    WHERE r.rentalDate <= :date "
+			        + "    AND r.dueDate >= :date"
+			        + ")";
+			Query query1 = manager.createQuery(queryString1);
+			query1.setParameter("date", Date.from(Instant.now()));
+			@SuppressWarnings("unchecked")
+			List<Volume> rentalVolumes = query1.getResultList();
+
+			
+			String queryString2 = "SELECT v "
+			        + "FROM Volume v "
+			        + "WHERE v.id NOT IN (SELECT v2.id FROM Rental r JOIN r.volumes v2)";
+			Query query2 = manager.createQuery(queryString2);
+			@SuppressWarnings("unchecked")
+			List<Volume> noRentalVolumes = query2.getResultList();
+			
+			Set<Volume> uniqueVolumes = new HashSet<Volume>();
+			uniqueVolumes.addAll(rentalVolumes);		
+			uniqueVolumes.addAll(noRentalVolumes);
+			resultList = new ArrayList<Volume>(uniqueVolumes);
+		
+		}
+		else{
+			String queryString = "SELECT v FROM Volume v";		
+			Query query = manager.createQuery(queryString);
+			@SuppressWarnings("unchecked")
+		    List<Volume> list = query.getResultList();
+			resultList = list;
+		}
+		
+
 		List<VolumeReturnDTO> vrDTO = new ArrayList<VolumeReturnDTO>();
 		for(Volume v : resultList){
 			VolumeReturnDTO vr = ConvertVolumeToVolumeReturnDto(v);
@@ -131,11 +171,13 @@ public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
 	}
 	
 	public void delete(int id) throws Exception {
-		try {
+
 		    Volume volume = manager.find(Volume.class, id);
+
 	        if (volume == null) {
 	            throw new Exception("Volume not found with id: " + id);
 	        }
+
 		    Book book = volume.getBook();
 	        if (book == null) {
 	            throw new Exception("Book not found with id: ");
@@ -143,11 +185,6 @@ public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
 	        book.getVolumes().remove(volume);
 		    //System.out.println("Volumin:" + id + ", of " + volume.getBook().getId());
 		    manager.remove(volume);
-		}
-		catch (Exception e) {
-		    e.printStackTrace();
-		} finally {
-		}
 	}
 	
 	
@@ -197,6 +234,7 @@ public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
 		query.setParameter("id", id);
 		query.setParameter("rentalDate", rentalDate);
 		query.setParameter("dueDate", dueDate);
+		query.setParameter("id", id);
 
 	    
 	    @SuppressWarnings("unchecked")
@@ -210,4 +248,57 @@ public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
 	    	return false;
 	    }
 	}
+	
+	public List<VolumeReturnDTO> getAvailable (){
+		String queryString1 = "SELECT v "
+		        + "FROM Volume v "
+		        + "WHERE v.id NOT IN ("
+		        + "    SELECT v2.id "
+		        + "    FROM Rental r "
+		        + "    JOIN r.volumes v2 "
+		        + "    WHERE r.rentalDate <= :date "
+		        + "    AND r.dueDate >= :date"
+		        + ")";
+		Query query1 = manager.createQuery(queryString1);
+		query1.setParameter("date", Date.from(Instant.now()));
+		@SuppressWarnings("unchecked")
+		List<Volume> rentalVolumes = query1.getResultList();
+
+		
+		String queryString2 = "SELECT v "
+		        + "FROM Volume v "
+		        + "WHERE v.id NOT IN (SELECT v2.id FROM Rental r JOIN r.volumes v2)";
+		Query query2 = manager.createQuery(queryString2);
+		@SuppressWarnings("unchecked")
+		List<Volume> noRentalVolumes = query2.getResultList();
+		
+		List<Volume> resultList = new ArrayList<Volume>();
+		resultList.addAll(rentalVolumes);
+		resultList.addAll(noRentalVolumes);
+
+		
+		List<VolumeReturnDTO> vrDTO = new ArrayList<VolumeReturnDTO>();
+		for(Volume v : resultList){
+			VolumeReturnDTO vr = new VolumeReturnDTO();
+			vr.setBookCover(v.getBookCover());
+			vr.setCondition(v.getCondition());
+			vr.setId(v.getId());
+			vr.setPages(v.getPages());
+			vr.setYearOfPublication(v.getYearOfPublication());
+			
+			Book b = v.getBook();
+			VolumeBookReturnDTO vbr = new VolumeBookReturnDTO();
+			vbr.setAuthorName(b.getAuthorName());
+			vbr.setAuthorSurname(b.getAuthorSurname());
+			vbr.setDescription(b.getDescription());
+			vbr.setId(b.getId());
+			vbr.setTitle(b.getTitle());
+			vbr.setVersion(b.getVersion());
+			
+			vr.setBook(vbr);
+			vrDTO.add(vr);		
+		}
+	    return vrDTO;
+	}
+	
 }

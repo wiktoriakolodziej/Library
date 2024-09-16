@@ -1,6 +1,5 @@
 package pl.library.controller;
 
-import java.sql.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -18,7 +17,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import pl.library.dao.Rental;
 import pl.library.dao.Volume;
 import pl.library.dto.VolumeCreateDTO;
 import pl.library.dto.VolumeReturnDTO;
@@ -54,9 +52,9 @@ public class VolumeController {
 	
 	
 	@GET
-	public Response getAll() {
+	public Response getAll(@QueryParam("available") @DefaultValue("false") boolean available) {
 		try {
-            List<VolumeReturnDTO> volumes = bean.getAllAll();
+            List<VolumeReturnDTO> volumes = bean.getAllAll(available);
             return Response.ok(volumes).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,8 +115,22 @@ public class VolumeController {
 		catch (Exception e) 
 		{
 			e.printStackTrace();
+
 			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
+	}	
+	
+	@GET
+	@Path("/available")
+	public Response getAvailable() {
+		try {
+            List<VolumeReturnDTO> volumes = bean.getAvailable();
+            return Response.ok(volumes).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }		
+
 	}
 }
 

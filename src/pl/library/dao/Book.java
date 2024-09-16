@@ -23,11 +23,11 @@ public class Book {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
-	@Column(updatable = false, nullable = false)
+	@Column(nullable = false)
 	String title;
-	@Column(updatable = false, nullable = false)
+	@Column(nullable = false)
 	String authorName;
-	@Column(updatable = false, nullable = false)
+	@Column(nullable = false)
 	String authorSurname;
 	int version;
 	String description;
