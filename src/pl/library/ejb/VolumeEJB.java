@@ -225,10 +225,10 @@ public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
             throw new Exception("Due date is required");
         }
         String queryString = "SELECT r FROM Rental r WHERE r.id = :id AND "
-				+ "((r.returnDate IS NULL AND r.dueDate > :rentalDate AND r.rentalDate  < :rentalDate AND r.dueDate < :dueDate) OR "
-				+ "(r.returnDate IS NULL AND r.rentalDate > :rentalDate AND r.dueDate > :dueDate AND r.rentalDate < :dueDate) OR " 
-				+ "(r.returnDate IS NULL AND r.rentalDate < :rentalDate AND r.dueDate > :dueDate) OR "
-				+ "(r.returnDate IS NULL AND r.rentalDate > :rentalDate AND r.dueDate < :dueDate))";
+				+ "((r.returnDate IS NULL AND r.dueDate >= :rentalDate AND r.rentalDate  <= :rentalDate AND r.dueDate <= :dueDate) OR "
+				+ "(r.returnDate IS NULL AND r.rentalDate >= :rentalDate AND r.dueDate >= :dueDate AND r.rentalDate <= :dueDate) OR " 
+				+ "(r.returnDate IS NULL AND r.rentalDate <= :rentalDate AND r.dueDate >= :dueDate) OR "
+				+ "(r.returnDate IS NULL AND r.rentalDate >= :rentalDate AND r.dueDate <= :dueDate))";
 		Query query = manager.createQuery(queryString);
 	    
 		query.setParameter("id", id);

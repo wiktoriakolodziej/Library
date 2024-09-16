@@ -32,7 +32,7 @@ public class RentalEJB {
 	public RentalDTO create(RentalDTO rentalDTO)  throws Exception{
 		for(int id : rentalDTO.getVolumeIds()){
 			if(!bean.IsAvailable(id, rentalDTO.getRentalDate(), rentalDTO.getDueDate())){
-				throw new Exception("Volume of id: " + id + "is not available in chosen dates");
+				throw new Exception("Volume of id: " + id + " is not available in chosen dates");
 			}
 		}
 		Rental rental = GetRental(rentalDTO);
@@ -93,7 +93,7 @@ public class RentalEJB {
 		
 		for(Volume volume : rental.getVolumes()){
 			if(!bean.IsAvailable(volume.getId(), rental.getRentalDate(), rentalDTO.getDueDate())){
-				throw new Exception("Volume of id: " + volume.getId() + "is not available in chosen dates");
+				throw new Exception("Volume of id: " + volume.getId() + " is not available in chosen dates");
 			}
 		}
 
