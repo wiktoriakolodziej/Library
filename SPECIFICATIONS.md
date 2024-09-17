@@ -56,13 +56,16 @@
 `post take/rental`
 - Create rental
 - Required parameters are: rentalDate and dueDate
+- Rentals with rental date before current date are forbidden
+- Rental with due date before rental date are forbidden
+- Can't rent a book that is currently rented, or that is not returned in time (if reader prolonged book without permission so return date is not set and due date is before today's date book is considered permanently unavailable)
 - Returns created rental in response
 - example request body
 ```json
 {
     "readerId": 1,
-    "rentalDate": "2022-09-17",
-    "dueDate": "2022-09-26",
+    "rentalDate": "2024-09-17",
+    "dueDate": "2024-09-26",
     "volumeIds": 
     [
         1
@@ -73,9 +76,9 @@
 ```json
 {
     "id": 3,
-    "rentalDate": "2022-09-17",
+    "rentalDate": "2024-09-17",
     "returnDate": null,
-    "dueDate": "2022-09-26",
+    "dueDate": "2024-09-26",
     "readerId": 1,
     "volumeIds": [
         1
@@ -92,16 +95,16 @@
 ```json
 {
     "id": 3,
-    "returnDate": "2022-09-27"
+    "returnDate": "2024-09-27"
 }
 ```
 - example response
 ```json
 {
     "id": 3,
-    "rentalDate": "2022-09-17",
-    "returnDate": "2022-09-27",
-    "dueDate": "2022-09-26",
+    "rentalDate": "2024-09-17",
+    "returnDate": "2024-09-27",
+    "dueDate": "2024-09-26",
     "readerId": 1,
     "volumeIds": [
         1
@@ -359,79 +362,65 @@
 
 #### Get By Id
 `get take/volume/{id}`
-- Get rental of specified id
+- Get volume of specified id
 - example response
 ```json
 {
     "id": 1,
-    "rentalDate": "2024-09-17",
-    "returnDate": null,
-    "dueDate": "2024-09-26",
-    "readerId": 1,
-    "volumeIds": [
-        1
-    ]
+    "yearOfPublication": 3000,
+    "bookCover": "hardcover",
+    "pages": 100,
+    "condition": "bad",
+    "book": {
+        "id": 1,
+        "title": "Hobbit",
+        "authorName": "John Ronald Reuel",
+        "authorSurname": "Tolkien",
+        "version": 1,
+        "description": "czyli tam i z powrotem"
+    }
 }
 ```
 
 #### Create
-`post take/rental`
-- Create rental
-- Required parameters are: rentalDate and dueDate
-- Returns created rental in response
+`post take/volume`
+- Create volume
+- Returns created volume in response
 - example request body
 ```json
 {
-    "readerId": 1,
-    "rentalDate": "2022-09-17",
-    "dueDate": "2022-09-26",
-    "volumeIds": 
-    [
-        1
-    ]
+    "bookId": 1,
+    "yearOfPublication": 3000,
+    "pagess": 100,
+    "bookCover": "hardcover",
+    "condition": "bad"
 }
 ```
 - example response
 ```json
 {
-    "id": 3,
-    "rentalDate": "2022-09-17",
-    "returnDate": null,
-    "dueDate": "2022-09-26",
-    "readerId": 1,
-    "volumeIds": [
-        1
-    ]
+    "id": 2,
+    "yearOfPublication": 3000,
+    "bookCover": "hardcover",
+    "pages": 100,
+    "condition": "bad",
+    "book": {
+        "id": 1,
+        "title": "Hobbit",
+        "authorName": "John Ronald Reuel",
+        "authorSurname": "Tolkien",
+        "version": 1,
+        "description": "czyli tam i z powrotem"
+    }
 }
 ```
 
 #### Update
-`put take/rental`
-- Modify already created rental
-- Parameters that can be changed are: returnDate and dueDate
-- Request must contain rental id
-- example request body
-```json
-{
-    "id": 3,
-    "returnDate": "2022-09-27"
-}
-```
-- example response
-```json
-{
-    "id": 3,
-    "rentalDate": "2022-09-17",
-    "returnDate": "2022-09-27",
-    "dueDate": "2022-09-26",
-    "readerId": 1,
-    "volumeIds": [
-        1
-    ]
-}
-```
+`put take/volume`
+- Modify already created volume
+TO DO
 
 #### Delete
-`delete take/rental/{id}`
-- Delete rental of specified id
+`delete take/volume/{id}`
+- Delete volume of specified id
 
