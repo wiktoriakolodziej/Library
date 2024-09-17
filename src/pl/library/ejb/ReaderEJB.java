@@ -79,7 +79,6 @@ public class ReaderEJB {
             throw new Exception("Reader not found");
         }
 
-        // Update only the fields that are not null in the DTO
         if (readerDTO.getReaderName() != null) {
             existingReader.setReaderName(readerDTO.getReaderName());
         }

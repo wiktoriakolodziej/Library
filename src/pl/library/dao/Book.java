@@ -12,7 +12,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
-//import org.hibernate.annotations.CascadeType;
 
 
 @Entity
@@ -33,7 +32,6 @@ public class Book {
 	String description;
 		
 	
-	//@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	Set<Volume> volumes;
 	

@@ -80,7 +80,6 @@ public class RentalController {
 		} 
 		catch (Exception e) 
 		{
-			//e.printStackTrace();
 			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
 	}
@@ -94,8 +93,7 @@ public class RentalController {
 		}
 		catch(Exception e){
 			 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-		}
-		
+		}		
 	}
 	
 	

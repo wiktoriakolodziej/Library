@@ -10,7 +10,7 @@ public class VolumeReturnDTO {
 	BookCover bookCover;
 	int pages;
 	Condition condition;
-	VolumeBookReturnDTO book;
+	BookWithoutVolumeDTO book;
 	
 	public int getId(){return id;}
 	public void setId(int id){this.id = id;}
@@ -24,8 +24,8 @@ public class VolumeReturnDTO {
 	public int getPages(){return pages;}
 	public void setPages(int pagess){this.pages = pagess;}
 	
-	public VolumeBookReturnDTO getBook(){return book;}
-	public void setBook(VolumeBookReturnDTO book){this.book = book;}
+	public BookWithoutVolumeDTO getBook(){return book;}
+	public void setBook(BookWithoutVolumeDTO book){this.book = book;}
 	
 	public Condition getCondition(){return condition;}
 	public void setCondition(Condition conditionn){this.condition = conditionn;}

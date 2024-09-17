@@ -15,10 +15,10 @@ import javax.persistence.Query;
 import pl.library.dao.Book;
 import pl.library.dao.Rental;
 import pl.library.dao.Volume;
-import pl.library.dto.VolumeBookReturnDTO;
+import pl.library.dto.BookWithoutVolumeDTO;
 import pl.library.dto.VolumeCreateDTO;
 import pl.library.dto.VolumeReturnDTO;
-import pl.library.dto.VolumeUpdateDTO; 
+import pl.library.dto.VolumeWithoutBookDTO; 
 
 @Stateful
 public class VolumeEJB {
@@ -31,11 +31,15 @@ public class VolumeEJB {
 		if (v == null) {
 	            throw new Exception("Volume not found with id: " + id);
 	    }
-		return ConvertVolumeToVolumeReturnDto(v);		
+		VolumeReturnDTO vr = ConvertVolumeToVolumeReturnDto(v);
+		Book b = v.getBook();
+		BookWithoutVolumeDTO vbr = ConvertBookToVolumeBookReturnDTO (b);
+		vr.setBook(vbr);
+		return vr;
 	}
 	
 
-	public List<VolumeReturnDTO> getAllAll(boolean available){
+	public List<VolumeReturnDTO> getAll(boolean available){
 		List<Volume> resultList = new ArrayList<Volume>();
 		if(available){
 
@@ -80,7 +84,7 @@ public class VolumeEJB {
 		for(Volume v : resultList){
 			VolumeReturnDTO vr = ConvertVolumeToVolumeReturnDto(v);
 			Book b = v.getBook();
-			VolumeBookReturnDTO vbr = ConvertBookToVolumeBookReturnDTO(b);
+			BookWithoutVolumeDTO vbr = ConvertBookToVolumeBookReturnDTO(b);
 			vr.setBook(vbr);
 			vrDTO.add(vr);		
 		}
@@ -88,8 +92,8 @@ public class VolumeEJB {
 	}
 	
 	
-	public List<VolumeReturnDTO> getAll(int bookId) throws Exception{
-		Book book = manager.find(Book.class, bookId); //zostawic?
+	public List<VolumeReturnDTO> getAllForBook(int bookId) throws Exception{
+		Book book = manager.find(Book.class, bookId); 
 		if (book == null) {
 	            throw new Exception("Book not found with id: " + bookId);
 	    }		
@@ -108,7 +112,7 @@ public class VolumeEJB {
 		for(Volume v : resultList){
 			VolumeReturnDTO vr = ConvertVolumeToVolumeReturnDto(v);
 			Book b = v.getBook();
-			VolumeBookReturnDTO vbr = ConvertBookToVolumeBookReturnDTO (b);
+			BookWithoutVolumeDTO vbr = ConvertBookToVolumeBookReturnDTO (b);
 			vr.setBook(vbr);
 			vrDTO.add(vr);			
 		}
@@ -131,14 +135,14 @@ public class VolumeEJB {
 	     manager.persist(volume);
 	     VolumeReturnDTO vr = ConvertVolumeToVolumeReturnDto(volume);
 		 Book b = volume.getBook();
-		 VolumeBookReturnDTO vbr = ConvertBookToVolumeBookReturnDTO (b);
+		 BookWithoutVolumeDTO vbr = ConvertBookToVolumeBookReturnDTO (b);
 	     vr.setBook(vbr);
 	     return vr;
 	     //return ConvertVolumeToVolumeReturnDto(volume);
 	} 	
 	
 	
-public VolumeReturnDTO update(VolumeUpdateDTO volume) {
+public VolumeReturnDTO update(VolumeWithoutBookDTO volume) {
 		
 		Volume existingVolume = manager.find(Volume.class, volume.getId());
 		
@@ -165,21 +169,11 @@ public VolumeReturnDTO update(VolumeUpdateDTO volume) {
         existingVolume.setBook(existingVolume.getBook());
         manager.persist(existingVolume);
         
-        /*VolumeUpdateDTO ret = new VolumeUpdateDTO();
-        ret.setBookCover(existingVolume.getBookCover());
-        ret.setCondition(existingVolume.getCondition());
-        ret.setId(existingVolume.getId());
-        ret.setPages(existingVolume.getPages());
-        ret.setYearOfPublication(existingVolume.getYearOfPublication()); */
-        
         VolumeReturnDTO vr = ConvertVolumeToVolumeReturnDto(existingVolume);
 		 Book b = existingVolume.getBook();
-		 VolumeBookReturnDTO vbr = ConvertBookToVolumeBookReturnDTO (b);
+		 BookWithoutVolumeDTO vbr = ConvertBookToVolumeBookReturnDTO (b);
 	     vr.setBook(vbr);
-	     return vr;
-        
-        
-        //return ret;
+	     return vr;                
 	}
 	
 	public void delete(int id) throws Exception {
@@ -195,7 +189,6 @@ public VolumeReturnDTO update(VolumeUpdateDTO volume) {
 	            throw new Exception("Book not found with id: ");
 	        }
 	        book.getVolumes().remove(volume);
-		    //System.out.println("Volumin:" + id + ", of " + volume.getBook().getId());
 		    manager.remove(volume);
 	}
 	
@@ -212,8 +205,8 @@ public VolumeReturnDTO update(VolumeUpdateDTO volume) {
 	
 	
 	
-	private VolumeBookReturnDTO ConvertBookToVolumeBookReturnDTO(Book b){
-		VolumeBookReturnDTO vbr = new VolumeBookReturnDTO();
+	private BookWithoutVolumeDTO ConvertBookToVolumeBookReturnDTO(Book b){
+		BookWithoutVolumeDTO vbr = new BookWithoutVolumeDTO();
 		vbr.setAuthorName(b.getAuthorName());
 		vbr.setAuthorSurname(b.getAuthorSurname());
 		vbr.setDescription(b.getDescription());
@@ -266,7 +259,6 @@ public VolumeReturnDTO update(VolumeUpdateDTO volume) {
 	    System.out.println("resultList.isEmpty(): " + availableVolumes.isEmpty());
 	    System.out.println(availableVolumes.size());
 	    if(!availableVolumes.isEmpty()){
-	    	//dostepny
 	    	return true;
 	    }
 	    else{

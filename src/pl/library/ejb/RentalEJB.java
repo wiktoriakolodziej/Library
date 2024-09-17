@@ -110,12 +110,6 @@ public class RentalEJB {
 		if(rentalDTO.getReturnDate() != null) date = rentalDTO.getReturnDate();
 		else if(rentalDTO.getDueDate() != null) date = rentalDTO.getDueDate();
 		else date = (rental.getReturnDate() == null ? rental.getDueDate() : rental.getReturnDate());
-		
-//		for(Volume volume : rental.getVolumes()){
-//			if(!bean.IsAvailable(volume.getId(), rental.getRentalDate(),date)){
-//				throw new Exception("Volume of id: " + volume.getId() + " is not available in chosen dates");
-//			}
-//		}
 
 		Rental merged = Merge(rentalDTO, rental);
 		manager.persist(merged);

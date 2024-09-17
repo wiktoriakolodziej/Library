@@ -2,26 +2,13 @@ package pl.library.dto;
 
 import java.util.Set;
 
-public class VolumeBookReturnDTO {
+public class BookWithoutVolumeDTO {
 	int id;
 	String title;
 	String authorName;
 	String authorSurname;
 	int version;
 	String description;
-
-	
-	public VolumeBookReturnDTO(){}
-	
-	public VolumeBookReturnDTO(int id, String title, String authorName, String authorSurname, int version, 
-			String description) {
-	        this.id = id;
-	        this.title = title;
-	        this.authorName = authorName;
-	        this.authorSurname = authorSurname;
-	        this.version = version;
-	        this.description = description;
-	}
 	
 	public int getId(){return id;}
 	public void setId(int id){this.id = id;}

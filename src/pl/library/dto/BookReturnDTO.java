@@ -11,7 +11,7 @@ public class BookReturnDTO {
 	String authorSurname;
 	int version;
 	String description;
-	Set<BookVolumeReturnDTO> volumes;
+	Set<VolumeWithoutBookDTO> volumes;
 	
 	public BookReturnDTO(){}
 	
@@ -43,6 +43,6 @@ public class BookReturnDTO {
 	public String getDescription(){return description;}
 	public void setDescription(String description){this.description = description;}
 	
-	public Set<BookVolumeReturnDTO> getVolumes() {return volumes;}
-	public void setVolumes(Set<BookVolumeReturnDTO> volumes) {this.volumes =  volumes;}
+	public Set<VolumeWithoutBookDTO> getVolumes() {return volumes;}
+	public void setVolumes(Set<VolumeWithoutBookDTO> volumes) {this.volumes =  volumes;}
 }

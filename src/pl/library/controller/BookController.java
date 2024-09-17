@@ -20,7 +20,7 @@ import javax.ws.rs.core.Response;
 import pl.library.dao.Book;
 import pl.library.dto.BookCreateDTO;
 import pl.library.dto.BookReturnDTO;
-import pl.library.dto.BookUpdateDTO;
+import pl.library.dto.BookWithoutVolumeDTO;
 import pl.library.ejb.BookEJB;
 
 @Path("/book")
@@ -77,10 +77,10 @@ public class BookController {
 	
 	
 	@PUT
-	public Response update(BookUpdateDTO book) {
+	public Response update(BookWithoutVolumeDTO book) {
 		try 
 		{
-			BookUpdateDTO result = bean.update(book);
+			BookWithoutVolumeDTO result = bean.update(book);
 			
 			return Response.ok(result).build();
 		} 

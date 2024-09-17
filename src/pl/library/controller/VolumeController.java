@@ -20,7 +20,7 @@ import javax.ws.rs.core.Response;
 import pl.library.dao.Volume;
 import pl.library.dto.VolumeCreateDTO;
 import pl.library.dto.VolumeReturnDTO;
-import pl.library.dto.VolumeUpdateDTO;
+import pl.library.dto.VolumeWithoutBookDTO;
 import pl.library.ejb.VolumeEJB;
 
 
@@ -42,7 +42,6 @@ public class VolumeController {
 		try{
 			VolumeReturnDTO result = bean.get(id);
 			return Response.ok(bean.get(id)).build();
-
 		}
 		catch (Exception e) {
             e.printStackTrace();
@@ -54,7 +53,7 @@ public class VolumeController {
 	@GET
 	public Response getAll(@QueryParam("available") @DefaultValue("false") boolean available) {
 		try {
-            List<VolumeReturnDTO> volumes = bean.getAllAll(available);
+            List<VolumeReturnDTO> volumes = bean.getAll(available);
             return Response.ok(volumes).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,12 +62,11 @@ public class VolumeController {
 	}
 	
 	
-	//public Response getAll(@QueryParam("bookId") @DefaultValue("0") int bookId) {
 	@GET
 	@Path("forbook/{bookId}")
 	public Response getAll(@PathParam("bookId") int bookId) {
 		try {
-            List<VolumeReturnDTO> volumes = bean.getAll(bookId);
+            List<VolumeReturnDTO> volumes = bean.getAllForBook(bookId);
             return Response.ok(volumes).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,10 +89,9 @@ public class VolumeController {
 	
 	
 	@PUT
-	public Response update(VolumeUpdateDTO volume) {
+	public Response update(VolumeWithoutBookDTO volume) {
 		try 
 		{
-			//VolumeUpdateDTO result = bean.update(volume);	
 			VolumeReturnDTO result = bean.update(volume);	
 			return Response.ok(result).build();
 		} 

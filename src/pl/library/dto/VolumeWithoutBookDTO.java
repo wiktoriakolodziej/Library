@@ -3,7 +3,7 @@ package pl.library.dto;
 import pl.library.dao.Volume.BookCover;
 import pl.library.dao.Volume.Condition;
 
-public class VolumeUpdateDTO {
+public class VolumeWithoutBookDTO {
 	int id;
 	int yearOfPublication;
 	BookCover bookCover;

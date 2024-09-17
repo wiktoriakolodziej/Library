@@ -15,8 +15,8 @@ import pl.library.dao.Book;
 import pl.library.dao.Volume;
 import pl.library.dto.BookCreateDTO;
 import pl.library.dto.BookReturnDTO;
-import pl.library.dto.BookUpdateDTO;
-import pl.library.dto.BookVolumeReturnDTO;
+import pl.library.dto.BookWithoutVolumeDTO;
+import pl.library.dto.VolumeWithoutBookDTO;
 
 @Stateful
 public class BookEJB {
@@ -32,8 +32,6 @@ public class BookEJB {
 		return ConvertBookToReturnDto(b);		
 	}
 	
-	
-
 
 	public List<BookReturnDTO> getAll(String surname){
 		
@@ -54,9 +52,9 @@ public class BookEJB {
 		for(Book b : bookList)  {					
 			BookReturnDTO bookReturnDTO = ConvertBookToReturnDto(b);			
 			Set<Volume> vols = b.getVolumes();
-			Set<BookVolumeReturnDTO> volsDTO = new HashSet<BookVolumeReturnDTO>();
+			Set<VolumeWithoutBookDTO> volsDTO = new HashSet<VolumeWithoutBookDTO>();
 			for(Volume v : vols){
-				BookVolumeReturnDTO bvrDTO = ConvertVolumeToBookVolumeReturnDto(v);
+				VolumeWithoutBookDTO bvrDTO = ConvertVolumeToBookVolumeReturnDto(v);
 				volsDTO.add(bvrDTO);
 			}
 			bookReturnDTO.setVolumes(volsDTO);
@@ -79,7 +77,7 @@ public class BookEJB {
 	} 
 	
 	
-	public BookUpdateDTO update(BookUpdateDTO book)  {
+	public BookWithoutVolumeDTO update(BookWithoutVolumeDTO book)  {
 		Book existingBook = manager.find(Book.class, book.getId());
 		
 		if (existingBook == null) {
@@ -108,7 +106,7 @@ public class BookEJB {
         existingBook.setVolumes(v);
         manager.persist(existingBook);
         
-        BookUpdateDTO ret = new BookUpdateDTO();
+        BookWithoutVolumeDTO ret = new BookWithoutVolumeDTO();
 		ret.setAuthorName(existingBook.getAuthorName());
 		ret.setAuthorSurname(existingBook.getAuthorSurname());
 		ret.setDescription(existingBook.getDescription());
@@ -128,8 +126,8 @@ public class BookEJB {
 	}
 	
 	
-	private BookVolumeReturnDTO ConvertVolumeToBookVolumeReturnDto(Volume v){
-		BookVolumeReturnDTO bvrDTO = new BookVolumeReturnDTO();
+	private VolumeWithoutBookDTO ConvertVolumeToBookVolumeReturnDto(Volume v){
+		VolumeWithoutBookDTO bvrDTO = new VolumeWithoutBookDTO();
 		bvrDTO.setId(v.getId());
 		bvrDTO.setCondition(v.getCondition());
 		bvrDTO.setPages(v.getPages());
