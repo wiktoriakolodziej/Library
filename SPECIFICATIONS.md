@@ -113,3 +113,100 @@
 `delete take/rental/{id}`
 - Delete rental of specified id
 
+### Reader
+#### Get All
+`get take/reader`
+- Get list of all readers
+- example response
+```json
+[
+    {
+        "id": 1,
+        "readerName": "domi",
+        "readerSurname": "domi",
+        "birthDate": "2017-03-20",
+        "joiningDate": "2024-09-26",
+        "penalty": 10.0
+    },
+    {
+        "id": 2,
+        "readerName": "domi",
+        "readerSurname": "domi",
+        "birthDate": "2017-03-20",
+        "joiningDate": "2017-03-20",
+        "penalty": 0.0
+    }
+]
+```
+
+#### Get By Id
+`get take/reader/{id}`
+- Get reader of specified id
+- example response
+```json
+{
+    "id": 2,
+    "readerName": "domi",
+    "readerSurname": "domi",
+    "birthDate": "2017-03-20",
+    "joiningDate": "2017-03-20",
+    "penalty": 0.0
+}
+```
+
+#### Create
+`post take/reader`
+- Create reader
+- Required parameters are: readerName, readerSurname and birthDate
+- Returns created reader in response
+- Penalty is automatically set to 0.0 when creating a reader (but can be set manually to a different value)
+- example request body
+```json
+{
+    "readerName": "Jan",
+    "readerSurname": "Kowalski",
+    "birthDate": "2002-03-20",
+    "joiningDate": "2017-03-20"
+}
+```
+- example response
+```json
+{
+    "id": 3,
+    "readerName": "Jan",
+    "readerSurname": "Kowalski",
+    "birthDate": "2002-03-20",
+    "joiningDate": "2017-03-20",
+    "penalty": 0.0
+}
+```
+
+#### Update
+`put take/reader`
+- Modify already created reader
+- Parameters that can be changed are: readerName, readerSurname, birthDate, joiningDate and penalty
+- Request must contain reader id
+- example request body
+```json
+{
+    "id": 3,
+    "penalty": 10,
+    "joiningDate": "2024-09-26"
+}
+```
+- example response
+```json
+{
+    "id": 3,
+    "readerName": "Jan",
+    "readerSurname": "Kowalski",
+    "birthDate": "2002-03-20",
+    "joiningDate": "2024-09-26",
+    "penalty": 10.0
+}
+```
+
+#### Delete
+`delete take/reader/{id}`
+- Delete reader of specified id, also delete all its rentals
+
