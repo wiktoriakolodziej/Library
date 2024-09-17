@@ -129,11 +129,16 @@ public class VolumeEJB {
 		 volume.setBookCover(volumeDTO.getBookCover());
 		 volume.setCondition(volumeDTO.getCondition());
 	     manager.persist(volume);
-	     return ConvertVolumeToVolumeReturnDto(volume);
+	     VolumeReturnDTO vr = ConvertVolumeToVolumeReturnDto(volume);
+		 Book b = volume.getBook();
+		 VolumeBookReturnDTO vbr = ConvertBookToVolumeBookReturnDTO (b);
+	     vr.setBook(vbr);
+	     return vr;
+	     //return ConvertVolumeToVolumeReturnDto(volume);
 	} 	
 	
 	
-public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
+public VolumeReturnDTO update(VolumeUpdateDTO volume) {
 		
 		Volume existingVolume = manager.find(Volume.class, volume.getId());
 		
@@ -160,14 +165,21 @@ public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
         existingVolume.setBook(existingVolume.getBook());
         manager.persist(existingVolume);
         
-        VolumeUpdateDTO ret = new VolumeUpdateDTO();
+        /*VolumeUpdateDTO ret = new VolumeUpdateDTO();
         ret.setBookCover(existingVolume.getBookCover());
         ret.setCondition(existingVolume.getCondition());
         ret.setId(existingVolume.getId());
         ret.setPages(existingVolume.getPages());
-        ret.setYearOfPublication(existingVolume.getYearOfPublication());
+        ret.setYearOfPublication(existingVolume.getYearOfPublication()); */
         
-        return ret;
+        VolumeReturnDTO vr = ConvertVolumeToVolumeReturnDto(existingVolume);
+		 Book b = existingVolume.getBook();
+		 VolumeBookReturnDTO vbr = ConvertBookToVolumeBookReturnDTO (b);
+	     vr.setBook(vbr);
+	     return vr;
+        
+        
+        //return ret;
 	}
 	
 	public void delete(int id) throws Exception {

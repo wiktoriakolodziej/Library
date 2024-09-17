@@ -94,7 +94,8 @@ public class VolumeController {
 	public Response update(VolumeUpdateDTO volume) {
 		try 
 		{
-			VolumeUpdateDTO result = bean.update(volume);			
+			//VolumeUpdateDTO result = bean.update(volume);	
+			VolumeReturnDTO result = bean.update(volume);	
 			return Response.ok(result).build();
 		} 
 		catch (Exception e) 
