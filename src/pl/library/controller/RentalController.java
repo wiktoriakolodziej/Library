@@ -100,9 +100,9 @@ public class RentalController {
 	
 	
 	@GET
-	@Path("/testReader")
+	@Path("/test")
 	public void testReader(){
-		bean.testReader();
+		bean.test();
 	}
 	
 }

@@ -224,22 +224,36 @@ public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
         if (dueDate == null) {
             throw new Exception("Due date is required");
         }
-        String queryString = "SELECT r FROM Rental r WHERE r.id = :id AND "
-				+ "((r.returnDate IS NULL AND r.dueDate >= :rentalDate AND r.rentalDate  <= :rentalDate AND r.dueDate <= :dueDate) OR "
-				+ "(r.returnDate IS NULL AND r.rentalDate >= :rentalDate AND r.dueDate >= :dueDate AND r.rentalDate <= :dueDate) OR " 
-				+ "(r.returnDate IS NULL AND r.rentalDate <= :rentalDate AND r.dueDate >= :dueDate) OR "
-				+ "(r.returnDate IS NULL AND r.rentalDate >= :rentalDate AND r.dueDate <= :dueDate))";
-		Query query = manager.createQuery(queryString);
-	    
-		query.setParameter("id", id);
-		query.setParameter("rentalDate", rentalDate);
-		query.setParameter("dueDate", dueDate);
+        
+        String queryString2 = "SELECT v "
+                + "FROM Volume v "
+                + "WHERE v.id = :volumeId "
+                + "AND NOT EXISTS ("
+                + "    SELECT r "
+                + "    FROM Rental r "
+                + "    JOIN r.volumes rv "
+                + "    WHERE rv.id = :volumeId "
+                + "    AND ("
+                + "        (:rentalDate <= r.rentalDate AND :returnDate >= r.rentalDate) OR "
+                + "		   ((r.returnDate IS NOT NULL AND :rentalDate <= r.returnDate AND :returnDate >= r.rentalDate) OR "
+                + "			(r.returnDate IS NULL AND r.dueDate < :now AND :returnDate >= r.rentalDate) OR "
+                + "			(r.returnDate IS NULL AND :rentalDate <= r.dueDate AND :returnDate >= r.rentalDate))"
+                + "    )"
+                + ")";
 
-	    
-	    @SuppressWarnings("unchecked")
-	    List<Rental> resultList = query.getResultList();
-	    System.out.println("resultList.isEmpty(): " + resultList.isEmpty());
-	    if(resultList.isEmpty()){
+        Query query2 = manager.createQuery(queryString2);
+        query2.setParameter("volumeId", id);  // Volume ID to check
+        query2.setParameter("rentalDate", rentalDate);  // Start of requested rental period
+        query2.setParameter("returnDate", dueDate);  // End of requested rental period
+        query2.setParameter("now", Date.from(Instant.now()));
+
+        @SuppressWarnings("unchecked")
+        List<Volume> availableVolumes = query2.getResultList();
+        
+        
+	    System.out.println("resultList.isEmpty(): " + availableVolumes.isEmpty());
+	    System.out.println(availableVolumes.size());
+	    if(!availableVolumes.isEmpty()){
 	    	//dostepny
 	    	return true;
 	    }
@@ -248,56 +262,5 @@ public VolumeUpdateDTO update(VolumeUpdateDTO volume) {
 	    }
 	}
 	
-	public List<VolumeReturnDTO> getAvailable (){
-		String queryString1 = "SELECT v "
-		        + "FROM Volume v "
-		        + "WHERE v.id NOT IN ("
-		        + "    SELECT v2.id "
-		        + "    FROM Rental r "
-		        + "    JOIN r.volumes v2 "
-		        + "    WHERE r.rentalDate <= :date "
-		        + "    AND r.dueDate >= :date"
-		        + ")";
-		Query query1 = manager.createQuery(queryString1);
-		query1.setParameter("date", Date.from(Instant.now()));
-		@SuppressWarnings("unchecked")
-		List<Volume> rentalVolumes = query1.getResultList();
-
-		
-		String queryString2 = "SELECT v "
-		        + "FROM Volume v "
-		        + "WHERE v.id NOT IN (SELECT v2.id FROM Rental r JOIN r.volumes v2)";
-		Query query2 = manager.createQuery(queryString2);
-		@SuppressWarnings("unchecked")
-		List<Volume> noRentalVolumes = query2.getResultList();
-		
-		List<Volume> resultList = new ArrayList<Volume>();
-		resultList.addAll(rentalVolumes);
-		resultList.addAll(noRentalVolumes);
-
-		
-		List<VolumeReturnDTO> vrDTO = new ArrayList<VolumeReturnDTO>();
-		for(Volume v : resultList){
-			VolumeReturnDTO vr = new VolumeReturnDTO();
-			vr.setBookCover(v.getBookCover());
-			vr.setCondition(v.getCondition());
-			vr.setId(v.getId());
-			vr.setPages(v.getPages());
-			vr.setYearOfPublication(v.getYearOfPublication());
-			
-			Book b = v.getBook();
-			VolumeBookReturnDTO vbr = new VolumeBookReturnDTO();
-			vbr.setAuthorName(b.getAuthorName());
-			vbr.setAuthorSurname(b.getAuthorSurname());
-			vbr.setDescription(b.getDescription());
-			vbr.setId(b.getId());
-			vbr.setTitle(b.getTitle());
-			vbr.setVersion(b.getVersion());
-			
-			vr.setBook(vbr);
-			vrDTO.add(vr);		
-		}
-	    return vrDTO;
-	}
 	
 }
