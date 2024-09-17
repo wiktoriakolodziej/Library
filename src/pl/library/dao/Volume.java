@@ -25,11 +25,9 @@ public class Volume {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	int id;
-	@Column(updatable = false, nullable = false)
 	int yearOfPublication;
 	@Enumerated(EnumType.STRING)
 	BookCover bookCover;
-	@Column(updatable = false, nullable = false)
 	int pages;
 	@Enumerated(EnumType.STRING)
 	Condition condition;	

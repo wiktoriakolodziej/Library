@@ -81,7 +81,7 @@ public class RentalController {
 		catch (Exception e) 
 		{
 			//e.printStackTrace();
-			return Response.status(Response.Status.BAD_REQUEST).build();
+			return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
 		}
 	}
 	
@@ -100,9 +100,9 @@ public class RentalController {
 	
 	
 	@GET
-	@Path("/testReader")
+	@Path("/test")
 	public void testReader(){
-		bean.testReader();
+		bean.test();
 	}
 	
 }

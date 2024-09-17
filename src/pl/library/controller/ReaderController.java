@@ -45,10 +45,14 @@ public class ReaderController {
     @GET
     @Path("/{id}")
     public Response getReaderById(@PathParam("id") int id) {
-        Reader result = bean.get(id);
-        if(result == null)
-            return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.ok(result).build();
+    	try{
+    		ReaderDTO result = bean.get(id);
+    		return Response.ok(result).build();
+    	}
+    	catch(Exception e){
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+    	}
+      
     }
 
     @GET

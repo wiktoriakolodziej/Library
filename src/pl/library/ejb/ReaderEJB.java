@@ -32,8 +32,10 @@ public class ReaderEJB {
         return getDTO(reader);
     	
     }
-    public Reader get(int id) {
-        return manager.find(Reader.class, id);
+    public ReaderDTO get(int id) throws Exception {
+        Reader result = manager.find(Reader.class, id);
+        if(result == null) throw new Exception("Reader of id: " + id + " doesn't exist");
+        return getDTO(result);
     }
 
     public List<ReaderDTO> getAll(String name, String surname, float minPenalty) {

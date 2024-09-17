@@ -120,17 +120,5 @@ public class VolumeController {
 		}
 	}	
 	
-	@GET
-	@Path("/available")
-	public Response getAvailable() {
-		try {
-            List<VolumeReturnDTO> volumes = bean.getAvailable();
-            return Response.ok(volumes).build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        }		
-
-	}
 }
 

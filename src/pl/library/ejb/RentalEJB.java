@@ -1,7 +1,13 @@
 package pl.library.ejb;
 
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -30,9 +36,18 @@ public class RentalEJB {
 	
 	
 	public RentalDTO create(RentalDTO rentalDTO)  throws Exception{
+		Calendar todayCal = Calendar.getInstance();
+		todayCal.set(Calendar.HOUR_OF_DAY, 0);
+		todayCal.set(Calendar.MINUTE, 0);
+		todayCal.set(Calendar.SECOND, 0);
+		todayCal.set(Calendar.MILLISECOND, 0);
+		Date today = todayCal.getTime();
+		if(rentalDTO.getRentalDate().before(today)) throw new Exception("Rental date can't be from the past");
+		if(rentalDTO.getDueDate().before(rentalDTO.getRentalDate())) throw new Exception("Due date can't be before rental date");
 		for(int id : rentalDTO.getVolumeIds()){
 			if(!bean.IsAvailable(id, rentalDTO.getRentalDate(), rentalDTO.getDueDate())){
-				throw new Exception("Volume of id: " + id + "is not available in chosen dates");
+
+				throw new Exception("Volume of id: " + id + " is not available in chosen dates");
 			}
 		}
 		Rental rental = GetRental(rentalDTO);
@@ -91,15 +106,20 @@ public class RentalEJB {
 			throw new Exception("Rental of given id doesn't exist:" + rentalDTO.getId());
 		}
 		
-		for(Volume volume : rental.getVolumes()){
-			if(!bean.IsAvailable(volume.getId(), rental.getRentalDate(), rentalDTO.getDueDate())){
-				throw new Exception("Volume of id: " + volume.getId() + "is not available in chosen dates");
-			}
-		}
-
-		Merge(rentalDTO, rental);
+		Date date = new Date();
+		if(rentalDTO.getReturnDate() != null) date = rentalDTO.getReturnDate();
+		else if(rentalDTO.getDueDate() != null) date = rentalDTO.getDueDate();
+		else date = (rental.getReturnDate() == null ? rental.getDueDate() : rental.getReturnDate());
 		
-		return GetRentalDTO(manager.merge(rental));
+//		for(Volume volume : rental.getVolumes()){
+//			if(!bean.IsAvailable(volume.getId(), rental.getRentalDate(),date)){
+//				throw new Exception("Volume of id: " + volume.getId() + " is not available in chosen dates");
+//			}
+//		}
+
+		Rental merged = Merge(rentalDTO, rental);
+		manager.persist(merged);
+		return GetRentalDTO(merged);
 	}
 	
 	public void delete(int id) throws Exception {
@@ -168,11 +188,18 @@ public class RentalEJB {
 
 	}
 	
-	public void testReader(){
-		Reader reader = new Reader();
-		reader.setReaderName("domi");
-		reader.setReaderSurname("domi");
-		reader.setBirthDate(Date.from(Instant.now()));
-		manager.persist(reader);
+
+	public void test(){
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Rental rental = new Rental();
+		try {
+			rental.setRentalDate(dateFormat.parse("2022-09-09"));
+			rental.setDueDate(dateFormat.parse("2022-10-10"));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		rental.setReader(manager.find(Reader.class, 1));
+		rental.setVolumes(Arrays.asList((manager.find(Volume.class, 1))));
+		manager.persist(rental);
 	}
 }
