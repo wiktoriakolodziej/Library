@@ -418,7 +418,32 @@
 #### Update
 `put take/volume`
 - Modify already created volume
-TO DO
+- Return created volume in response
+- example request body
+```json
+{
+    "id": 1,
+    "condition": "good"
+}
+```
+- example response
+```json
+{
+    "id": 1,
+    "yearOfPublication": 3000,
+    "bookCover": null,
+    "pages": 100,
+    "condition": "good",
+    "book": {
+        "id": 2,
+        "title": "Kubus",
+        "authorName": "A",
+        "authorSurname": "M",
+        "version": 3,
+        "description": "Pierwszy opis Kubusia"
+    }
+}
+```
 
 #### Delete
 `delete take/volume/{id}`
