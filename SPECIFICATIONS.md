@@ -208,5 +208,111 @@
 
 #### Delete
 `delete take/reader/{id}`
-- Delete reader of specified id, also delete all its rentals
+- Delete reader of specified id and also all its rentals
+
+### Book
+#### Get All
+`get take/book`
+- Get list of all books and their volumes
+- Sorting:
+- authorSurname=N - sort by author surname
+- example response
+```json
+[
+    {
+        "id": 1,
+        "rentalDate": "2024-09-17",
+        "returnDate": null,
+        "dueDate": "2024-09-26",
+        "readerId": 1,
+        "volumeIds": [
+            1
+        ]
+    },
+    {
+        "id": 2,
+        "rentalDate": "2023-09-17",
+        "returnDate": "2023-09-27",
+        "dueDate": "2023-09-26",
+        "readerId": 1,
+        "volumeIds": [
+            1
+        ]
+    }
+]
+```
+
+#### Get By Id
+`get take/book/{id}`
+- Get book of specified id
+- example response
+```json
+{
+    "id": 2,
+    "title": "Hobbit",
+    "authorName": "John Ronald Reuel",
+    "authorSurname": "Tolkien",
+    "version": 1,
+    "description": "czyli tam i z powrotem",
+    "volumes": null
+}
+```
+
+#### Create
+`post take/book`
+- Create book
+- Required parameters are: title, authorName and authorSurname
+- Returns created book in response
+- example request body
+```json
+{
+    "title": "Hobbit",
+    "authorName": "John Ronald Reuel",
+    "authorSurname": "Tolkien",
+    "description": "czyli tam i z powrotem",
+    "version": 1
+}
+```
+- example response
+```json
+{
+    "id": 2,
+    "title": "Hobbit",
+    "authorName": "John Ronald Reuel",
+    "authorSurname": "Tolkien",
+    "version": 1,
+    "description": "czyli tam i z powrotem",
+    "volumes": null
+}
+```
+
+#### Update
+`put take/book`
+- Modify already created book
+- Parameters that can be changed are: title, authorName, authorSurname, version and description
+- Request must contain book id
+- example request body
+```json
+{
+    "id": 1,
+    "description": "Zmiana opisu",
+    "authorSurname": "Milne"
+}
+```
+- example response
+```json
+{
+    "id": 1,
+    "title": "Kubus",
+    "authorName": "A",
+    "authorSurname": "Milne",
+    "version": 3,
+    "description": "Zmiana opisu"
+}
+```
+
+#### Delete
+`delete take/book/{id}`
+- Delete book of specified id and also its volumes
+
 
