@@ -315,4 +315,123 @@
 `delete take/book/{id}`
 - Delete book of specified id and also its volumes
 
+### Volume
+#### Get All
+`get take/volume`
+- Get list of all volumes
+- Sorting:
+- available=true - shows only volumes available to rent by today
+- example response
+```json
+[
+    {
+        "id": 1,
+        "yearOfPublication": 3000,
+        "bookCover": "hardcover",
+        "pages": 100,
+        "condition": "bad",
+        "book": {
+            "id": 1,
+            "title": "Kubus",
+            "authorName": "A",
+            "authorSurname": "Milne",
+            "version": 3,
+            "description": "Zmiana opisu"
+        }
+    },
+    {
+        "id": 2,
+        "yearOfPublication": 3000,
+        "bookCover": "hardcover",
+        "pages": 100,
+        "condition": "bad",
+        "book": {
+            "id": 2,
+            "title": "Hobbit",
+            "authorName": "John Ronald Reuel",
+            "authorSurname": "Tolkien",
+            "version": 1,
+            "description": "czyli tam i z powrotem"
+        }
+    }
+]
+```
+
+#### Get By Id
+`get take/volume/{id}`
+- Get rental of specified id
+- example response
+```json
+{
+    "id": 1,
+    "rentalDate": "2024-09-17",
+    "returnDate": null,
+    "dueDate": "2024-09-26",
+    "readerId": 1,
+    "volumeIds": [
+        1
+    ]
+}
+```
+
+#### Create
+`post take/rental`
+- Create rental
+- Required parameters are: rentalDate and dueDate
+- Returns created rental in response
+- example request body
+```json
+{
+    "readerId": 1,
+    "rentalDate": "2022-09-17",
+    "dueDate": "2022-09-26",
+    "volumeIds": 
+    [
+        1
+    ]
+}
+```
+- example response
+```json
+{
+    "id": 3,
+    "rentalDate": "2022-09-17",
+    "returnDate": null,
+    "dueDate": "2022-09-26",
+    "readerId": 1,
+    "volumeIds": [
+        1
+    ]
+}
+```
+
+#### Update
+`put take/rental`
+- Modify already created rental
+- Parameters that can be changed are: returnDate and dueDate
+- Request must contain rental id
+- example request body
+```json
+{
+    "id": 3,
+    "returnDate": "2022-09-27"
+}
+```
+- example response
+```json
+{
+    "id": 3,
+    "rentalDate": "2022-09-17",
+    "returnDate": "2022-09-27",
+    "dueDate": "2022-09-26",
+    "readerId": 1,
+    "volumeIds": [
+        1
+    ]
+}
+```
+
+#### Delete
+`delete take/rental/{id}`
+- Delete rental of specified id
 
