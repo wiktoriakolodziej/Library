@@ -1,7 +1,7 @@
 ## Endpoints 
 
 ### Rental
-###### Package into JSON
+#### Get All
 `get take/rental`
 - Get list of all rentals
 - Sorting:
@@ -35,6 +35,7 @@
 ]
 ```
 
+#### Get By Id
 `get take/rental/{id}`
 - Get rental of specified id
 - example response
@@ -51,6 +52,7 @@
 }
 ```
 
+#### Create
 `post take/rental`
 - Create rental
 - Required parameters are: rentalDate and dueDate
@@ -81,6 +83,7 @@
 }
 ```
 
+#### Update
 `put take/rental`
 - Modify already created rental
 - Parameters that can be changed are: returnDate and dueDate
@@ -106,6 +109,7 @@
 }
 ```
 
+#### Delete
 `delete take/rental/{id}`
 - Delete rental of specified id
 
